@@ -1,0 +1,224 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap');
+
+:root {
+    --background-primary:#101118;
+    --background-secondary:#171821;
+    --background-tertiary:#252435;
+}
+
+html, head, body {
+    background: var(--background-primary);
+
+    margin:0;
+    padding:0;
+}
+
+p, h1, h2, h3 {
+    color:white;
+    font-family: 'Fira Mono', monospace;
+    font-weight: 100;
+
+    margin: 0;
+    padding: 0;
+}
+
+/* #region Navbar */
+#prefab_header {
+    margin:0;
+    padding:0;
+
+    z-index: 100;
+}
+
+.nav-bar {
+    display:flex;
+    justify-content: space-between;
+    align-items: center;
+
+    z-index: 100;
+
+    height: 100px;
+    width:90%;
+    margin:0;
+    padding:0 5% 0 5%;
+
+    filter:drop-shadow(0 0 5px #0009);
+    background:var(--background-tertiary);
+}
+
+.nav-bar h1 {
+    margin:0;
+    padding:0;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 40px;
+    font-weight: 400;
+}
+
+.nav-bar #profile {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    width:160px;
+    height:100%;
+}
+
+.nav-bar #profile a {
+    transition-duration: 0.3s;
+}
+
+.nav-bar #profile a:hover {
+    transform:translateY(10px);
+}
+
+.nav-bar #profile img {
+    height:50px;
+}
+
+@media screen and (max-width:400px) {
+    .nav-bar {
+        height:50px;
+    }
+
+    .nav-bar h1 {
+        font-size: 25px;
+    }
+
+    .nav-bar #profile {
+        width:90px;
+    }
+
+    .nav-bar #profile img {
+        height:30px;
+    }
+}
+/* #endregion */
+
+/*#region Scrollbar*/
+/* width */
+::-webkit-scrollbar {
+    width: 10px;
+    height:10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    border-radius: 20px;
+}
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: white;
+    border-radius: 20px;
+}
+/*#endregion */
+
+/* #region Stocks */
+.stock-selection {
+    overflow:hidden;
+
+    display:grid;
+    grid-gap: 1em;
+    grid-template-columns: repeat(auto-fit, 600px);
+
+    width:100%;
+
+    justify-content: center;
+}
+
+/* #region Stock instance */
+.stock {
+    overflow: hidden;
+    position: relative;
+
+    height:300px;
+    width:600px;
+
+    margin:0;
+    padding:0;
+
+    /* background-image:linear-gradient(#0000, #0000, #0000, #0000, #0000, #0009,#0009,#0007),
+    url('../../backend/graphs/temp.png'); */
+
+    background-size:contain;
+    /* background-repeat:no-repeat; */
+    background-position: right;
+
+    border-radius:25px;
+
+    filter:drop-shadow(0 0 5px #0009);
+}
+
+/* #region Title */
+.stock #title {
+    position:absolute;
+
+    bottom:2.5ch;
+    left:11em;
+
+    width:calc(600px - 12em);
+
+    display:flex;
+    justify-content: left;
+    align-items: center;
+}
+
+.stock #title > div {
+    display:flex;
+    justify-content: center;
+    align-items:center;
+    flex-direction: column;
+
+    float:left;
+
+    padding-right:1em;
+
+    width:fit-content;
+}
+
+.stock #title > div > img {
+    width:1em;
+}
+
+.stock #title #name {
+    width: calc(100% - 2em);
+
+    word-wrap: break-word;
+    font-size: 25px;
+}
+/* #endregion */
+
+/* #region Pricing */
+.stock #pricing {
+    position:absolute;
+
+    width:10em;
+    height:100%;
+
+    display:flex;
+    justify-content: space-evenly;
+    align-items: center;
+
+    flex-direction: column;
+
+    background:var(--background-tertiary);
+
+    filter:drop-shadow(0 0 5px #0009);
+}
+
+.stock #pricing > div > h1, .stock #pricing > div > h2 {
+    text-align: center;
+
+    font-size:25px;
+}
+
+.stock #pricing > div > h3 {
+    color:#555;
+
+    text-align: center;
+
+    font-style: italic;
+}
+/* #endregion */
+/* #endregion */
+/* #endregion */
+
