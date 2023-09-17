@@ -27,12 +27,13 @@ function updateSize(target, e) {
 }
 
 
+//var post_data = [];
 var post_data = [
     {
         username:"Ryan Gosling",
         description:"Lorem ipsum dolor sit amet consectetur adipisicing elit. Commodi, debitis sapiente. Excepturi fugiat atque placeat quod mollitia dolores quis maiores est sint explicabo voluptatibus, hic cum dolorum maxime perspiciatis qui.",
         time:"22min",
-        image:"",
+        image:"1.png",
         comments:[
             {
                 username:"lasjflasdjf",
@@ -127,6 +128,26 @@ var post_data = [
         ]
     }
 ]
+
+async function fetch_post_data() {
+    //post_data = [];
+
+    var http = new XMLHttpRequest();
+    http.onreadystatechange = function() {
+        if ((this.readyState == 4) && (this.status == 200)) {
+            // everything went well
+            console.log(post_data);
+            post_data = JSON.parse(JSON.parse(this.responseText));
+            console.log(post_data);
+        }
+    }
+
+    http.open("GET", `http://127.0.0.1:8000/fetch_all`, true);
+    http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    http.send();
+}
+
+//fetch_post_data();
 
 function populate() {
     content_parent.innerHTML = "";

@@ -1,14 +1,13 @@
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct Post {
+pub struct User {
     pub id: i64,
-    pub title: String,
-    pub description: String,
-    pub images: Vec<String>
+    pub username: String,
+    pub profile_pic: String
 }
 
-impl Post {
+impl User {
     pub fn fetch_as_json(&self) -> String {
         serde_json::to_string(&self).unwrap()
     }
