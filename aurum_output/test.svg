@@ -1,0 +1,23 @@
+<svg width='1100' height='700' viewBox='0 0 1100 700' fill='none' xmlns='http://www.w3.org/2000/svg'>
+            <style>
+                .regular {
+                    font: normal 25.3px sans-serif;
+                }
+            </style>
+
+            <defs>
+                <marker id='arrow' viewBox='0 0 10 10' refX='5' refY='5' markerWidth='6' markerHeight='6' orient='auto-start-reverse'>
+                    <path fill='#fff' d='M 0 0 L 10 5 L 0 10 z' />
+                </marker>
+            </defs>
+
+            <rect width='1100' height='700' fill='#24283b'/>
+
+            <text dominant-baseline='middle' text-anchor='middle' class='regular' x='77.00000000000001' y='350' transform='rotate(270 77.00000000000001, 350)' fill='#fff'>test Inc. share sell price (USD)</text>
+
+            <line x1='110' y1='630' x2='110' y2='70' stroke='#fff' stroke-width='2' marker-end='url(#arrow)'/>
+            <line x1='110' y1='630' x2='990' y2='630' stroke='#fff' stroke-width='2' marker-end='url(#arrow)'/>
+            
+
+            <rect x='250.25' y='510' width='93.5' height='64' rx='9.35' fill='#0f0' /><rect x='287.65' y='494' width='18.7' height='128' rx='9.35' fill='#0f0' /><rect x='437.25' y='382' width='93.5' height='128' rx='9.35' fill='#0f0' /><rect x='474.65' y='350' width='18.7' height='256' rx='9.35' fill='#0f0' /><rect x='624.25' y='126' width='93.5' height='256' rx='9.35' fill='#0f0' /><rect x='661.65' y='62' width='18.7' height='512' rx='9.35' fill='#0f0' />
+        </svg>

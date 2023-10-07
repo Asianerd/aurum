@@ -1,12 +1,17 @@
 use std::sync::Mutex;
+use std::time::Instant;
 #[macro_use] extern crate rocket;
-use rocket::{State, data};
+use rocket::State;
 use rocket::http::Header;
 use rocket::{Request, Response};
 use rocket::fairing::{Fairing, Info, Kind};
 
-mod post;
-mod user;
+use rand::prelude::*;
+
+
+
+mod stock;
+use stock::Stock;
 
 pub struct CORS;
 
@@ -29,89 +34,162 @@ impl Fairing for CORS {
 
 #[derive(Debug)]
 pub struct DataHolder {
-    pub posts: Vec<post::Post>,
-    pub users: Vec<user::User>
+    pub stocks: Vec<stock::Stock>
 }
+impl DataHolder {
+    fn new() -> DataHolder {
+        let mut r = DataHolder {
+            stocks: vec![]
+        };
+
+        // r.stocks.push(Stock {
+        //    id: 0u64,
+        //    name: "yttrium".to_string(),
+        //    magnitude: 0.05f64,
+        //    history: vec![200f64]
+        // });
+
+        for i in ["Hydrogen","Helium","Lithium","Beryllium","Boron","Carbon","Nitrogen","Oxygen","Fluorine","Neon","Sodium","Magnesium","Aluminum","Silicon","Phosphorus","Sulfur","Chlorine","Argon","Potassium","Calcium","Scandium","Titanium","Vanadium","Chromium","Manganese","Iron","Cobalt","Nickel","Copper","Zinc","Gallium","Germanium","Arsenic","Selenium","Bromine","Krypton","Rubidium","Strontium","Yttrium","Zirconium","Niobium","Molybdenum","Technetium","Ruthenium","Rhodium","Palladium","Silver","Cadmium","Indium","Tin","Antimony","Tellurium","Iodine","Xenon","Cesium","Barium","Lanthanum","Cerium","Praseodymium","Neodymium","Promethium","Samarium","Europium","Gadolinium","Terbium","Dysprosium","Holmium","Erbium","Thulium","Ytterbium","Lutetium","Hafnium","Tantalum","Wolfram","Rhenium","Osmium","Iridium","Platinum","Gold","Mercury","Thallium","Lead","Bismuth","Polonium","Astatine","Radon","Francium","Radium","Actinium","Thorium","Protactinium","Uranium","Neptunium","Plutonium","Americium","Curium","Berkelium","Californium","Einsteinium","Fermium","Mendelevium","Nobelium","Lawrencium","Rutherfordium","Dubnium","Seaborgium","Bohrium","Hassium","Meitnerium","Darmstadtium","Roentgenium","Copernicium","Nihonium","Flerovium","Moscovium","Livermorium","Tennessine","Oganesson"] {
+        //for i in ["Carbon"] {
+            r.stocks.push(Stock {
+                id: r.stocks.len() as u64,
+                name: i.to_string(),
+                magnitude: rand::thread_rng().gen_range(0.01..=10.0),
+                history: vec![rand::thread_rng().gen_range(250.0..350.0)],
+                growth_rate: 0.0,
+                bankrupt: false
+            });
+        }
+
+        for _ in 0..100 {
+            for x in &mut r.stocks {
+                x.age();
+            }
+        }
+
+        // r.stocks = vec![
+        //     Stock {
+        //         id: 0,
+        //         name: "Child Grooming".to_string(),
+        //         magnitude: 1000.0,
+        //         history: vec![5000.0],
+        //         growth_rate: 0.0
+        //     }
+        // ];
+
+        for x in &mut r.stocks {
+            x.generate_svg(1100.0, 700.0);
+        }
+
+        // r.stocks = vec![
+        //     Stock {
+        //         id: 0,
+        //         name: "test".to_string(),
+        //         magnitude: 50.0,
+        //         history: vec![
+        //             100.0, 120.0
+        //         ],
+        //         growth_rate:0.0
+        //     }
+        // ];
+        // println!("Growth rate : {}", r.stocks[0].growth_rate());
+        // panic!();
+        r
+    }
+}
+
 
 #[get("/")]
 fn index() -> &'static str {
     "can you understand me?"
 }
 
-#[get("/")]
-fn fetch_all(data_holder: &State<Mutex<DataHolder>>) -> String {
-    let data = data_holder.lock().unwrap();
-    format!("{:?}", serde_json::to_string(&(*data).posts).unwrap().as_str())
-}
+#[get("/<iterations>")]
+fn age(iterations:i32, data_holder: &State<Mutex<DataHolder>>) -> String {
+    let mut result = "".to_string();
 
-#[get("/<title>/<description>/<image>")]
-fn add_post(title: String, description: String, image: String, data_holder: &State<Mutex<DataHolder>>) -> String {
     let mut data = data_holder.lock().unwrap();
-    let new_id = (*data).posts.len() as i64;
-    (*data).posts.push(post::Post {
-        id: new_id,
-        title: title,
-        description: description,
-        images: vec![
-            image
-            ]
-    });
-    format!("{data_holder:?}")
-}
-
-#[get("/<id>")]
-fn fetch_post(id: i64, data_holder: &State<Mutex<DataHolder>>) -> String {
-    let data = data_holder.lock().unwrap();
-    for p in &(*data).posts {
-        if id == p.id {
-            return p.fetch_as_json();
+    let now = Instant::now();
+    for x in &mut (*data).stocks {
+        for _ in 0..iterations {
+            x.age();
         }
+        result += &format!("{:?} : {:?} values, \n", x.name, x.history.len()).to_string();
     }
-    "".to_string()
-}
 
+    format!("{} stocks aged\n{:?}μs elapsed ({}s)\n{result}", (*data).stocks.len(), now.elapsed().as_micros(), now.elapsed().as_secs_f64())
+}
 
 #[get("/")]
-fn fetch_all_users(data_holder: &State<Mutex<DataHolder>>) {
-    format!("{:?}", (*(data_holder.lock().unwrap())).users);
-}
+fn get_svg(data_holder: &State<Mutex<DataHolder>>) -> String {
+    let data = data_holder.lock().unwrap();
 
-#[get("/<username>/<profile_pic>")]
-fn add_user(username: String, profile_pic: String, data_holder: &State<Mutex<DataHolder>>) -> String {
-    let mut data = data_holder.lock().unwrap();
-    let new_id = (*data).users.len() as i64;
-    (*data).users.push(user::User {
-        id: new_id,
-        username: username,
-        profile_pic: profile_pic
-    });
-    "".to_string()
-}
-
-#[get("/<id>")]
-fn fetch_user(id: i64, data_holder: &State<Mutex<DataHolder>>) -> String {
-    for u in &(*(data_holder.lock().unwrap())).users {
-        if id == u.id {
-            return u.fetch_as_json();
-        }
+    let now = Instant::now();
+    for x in &(*data).stocks {
+        x.generate_svg(1600f64, 900f64);
+        println!("{}'s graph generated", x.name);
     }
-    "".to_string()
+
+    format!("{} svgs generated\n{:?}ms elapsed ({}s)", (*data).stocks.len(), now.elapsed().as_millis(), now.elapsed().as_secs_f64())
+}
+
+#[get("/")]
+fn age_svg(data_holder: &State<Mutex<DataHolder>>) -> String {
+    let mut result = "".to_string();
+
+    let mut data = data_holder.lock().unwrap();
+    let now = Instant::now();
+    for x in &mut (*data).stocks {
+        x.age();
+        result += &format!("{:?} : {:?} values, \n", x.name, x.history.len()).to_string();
+    }
+
+    for x in &(*data).stocks {
+        x.generate_svg(1600f64, 900f64);
+        println!("{}'s graph generated", x.name);
+    }
+
+    format!("{} svgs generated\n{:?}ms elapsed ({}s)\n{} stocks aged\n{:?}μs elapsed ({}s)\n{result}", (*data).stocks.len(), now.elapsed().as_millis(), now.elapsed().as_secs_f64(), (*data).stocks.len(), now.elapsed().as_micros(), now.elapsed().as_secs_f64())
+
+}
+
+#[get("/<trend>/<amount>")]
+fn fetch_stocks(amount: i32, trend: String, data_holder: &State<Mutex<DataHolder>>) -> String {
+    let data = data_holder.lock().unwrap();
+    stock::Stock::fetch_stocks(trend, &data.stocks, amount)
+}
+
+#[get("/")]
+fn purge(data_holder: &State<Mutex<DataHolder>>) {
+    let mut data = data_holder.lock().unwrap();
+    for x in &mut data.stocks {
+        x.history = vec![];
+        x.growth_rate = 0.0;
+        x.bankrupt = false;
+    }
+}
+
+#[get("/")]
+fn debug(data_holder: &State<Mutex<DataHolder>>) -> String {
+    let data = data_holder.lock().unwrap();
+    let mut result = "".to_string();
+    for x in &data.stocks {
+        result += format!("{} : {}\n", x.name, x.growth_rate).as_str();
+    }
+    result
 }
 
 #[launch]
 fn rocket() -> _ {
     rocket::build()
-        .manage(Mutex::new(DataHolder {
-            posts: vec![],
-            users: vec![]
-        }))
+        .manage(Mutex::new(DataHolder::new()))
         .mount("/", routes![index])
-        .mount("/fetch_all_posts", routes![fetch_all])
-        .mount("/add_post", routes![add_post])
-        .mount("/fetch_post", routes![fetch_post])
+        .mount("/age", routes![age])
+        .mount("/svg", routes![get_svg])
+        .mount("/debug", routes![debug])
+        .mount("/fetch_stock", routes![fetch_stocks])
+        .mount("/age_svg", routes![age_svg])
+        .mount("/purge", routes![purge])
 
-        .mount("/fetch_all_users", routes![fetch_all_users])
-        .mount("/fetch_user", routes![fetch_user])
-        .mount("/add_user", routes![add_user])
         .attach(CORS)
 }

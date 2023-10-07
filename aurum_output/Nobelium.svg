@@ -1,0 +1,39 @@
+<svg width='1600' height='900' viewBox='0 0 1600 900' fill='none' xmlns='http://www.w3.org/2000/svg'>
+            <style>
+                .regular {
+                    font: normal 36.8px sans-serif;
+                }
+            </style>
+
+            <defs>
+                <marker id='arrow' viewBox='0 0 10 10' refX='5' refY='5' markerWidth='6' markerHeight='6' orient='auto-start-reverse'>
+                    <path fill='#fff' d='M 0 0 L 10 5 L 0 10 z' />
+                </marker>
+            </defs>
+
+            <rect width='1600' height='900' fill='#24283b'/>
+
+            <line x1='160' y1='810' x2='160' y2='90' stroke='#fff' stroke-width='2' marker-end='url(#arrow)'/>
+            <line x1='160' y1='810' x2='1440' y2='810' stroke='#fff' stroke-width='2' marker-end='url(#arrow)'/>
+
+            <rect x='200.80' y='454.38' width='27.20' height='21.44' rx='2.72' fill='#0f0' /><rect x='211.68' y='438.30' width='5.44' height='42.88' rx='2.72' fill='#0f0' />
+<rect x='255.20' y='317.62' width='27.20' height='136.75' rx='2.72' fill='#0f0' /><rect x='266.08' y='215.05' width='5.44' height='273.51' rx='2.72' fill='#0f0' />
+<rect x='309.60' y='315.40' width='27.20' height='2.22' rx='2.72' fill='#0f0' /><rect x='320.48' y='313.73' width='5.44' height='4.44' rx='2.72' fill='#0f0' />
+<rect x='364.00' y='234.16' width='27.20' height='81.24' rx='2.72' fill='#0f0' /><rect x='374.88' y='173.24' width='5.44' height='162.47' rx='2.72' fill='#0f0' />
+<rect x='418.40' y='234.16' width='27.20' height='32.36' rx='2.72' fill='#f00' /><rect x='429.28' y='226.08' width='5.44' height='64.71' rx='2.72' fill='#f00' />
+<rect x='472.80' y='189.57' width='27.20' height='76.95' rx='2.72' fill='#0f0' /><rect x='483.68' y='131.85' width='5.44' height='153.91' rx='2.72' fill='#0f0' />
+<rect x='527.20' y='189.57' width='27.20' height='118.60' rx='2.72' fill='#f00' /><rect x='538.08' y='159.92' width='5.44' height='237.21' rx='2.72' fill='#f00' />
+<rect x='581.60' y='308.17' width='27.20' height='19.07' rx='2.72' fill='#f00' /><rect x='592.48' y='303.40' width='5.44' height='38.14' rx='2.72' fill='#f00' />
+<rect x='636.00' y='162.00' width='27.20' height='165.24' rx='2.72' fill='#0f0' /><rect x='646.88' y='38.07' width='5.44' height='330.49' rx='2.72' fill='#0f0' />
+<rect x='690.40' y='162.00' width='27.20' height='345.30' rx='2.72' fill='#f00' /><rect x='701.28' y='75.67' width='5.44' height='690.59' rx='2.72' fill='#f00' />
+<rect x='744.80' y='398.53' width='27.20' height='108.76' rx='2.72' fill='#0f0' /><rect x='755.68' y='316.97' width='5.44' height='217.52' rx='2.72' fill='#0f0' />
+<rect x='799.20' y='361.55' width='27.20' height='36.99' rx='2.72' fill='#0f0' /><rect x='810.08' y='333.81' width='5.44' height='73.97' rx='2.72' fill='#0f0' />
+<rect x='853.60' y='361.55' width='27.20' height='79.31' rx='2.72' fill='#f00' /><rect x='864.48' y='341.72' width='5.44' height='158.61' rx='2.72' fill='#f00' />
+<rect x='908.00' y='440.86' width='27.20' height='34.58' rx='2.72' fill='#f00' /><rect x='918.88' y='432.21' width='5.44' height='69.16' rx='2.72' fill='#f00' />
+<rect x='962.40' y='475.43' width='27.20' height='84.40' rx='2.72' fill='#f00' /><rect x='973.28' y='454.33' width='5.44' height='168.81' rx='2.72' fill='#f00' />
+<rect x='1016.80' y='559.84' width='27.20' height='178.16' rx='2.72' fill='#f00' /><rect x='1027.68' y='515.30' width='5.44' height='356.32' rx='2.72' fill='#f00' />
+<rect x='1071.20' y='503.22' width='27.20' height='234.78' rx='2.72' fill='#0f0' /><rect x='1082.08' y='327.14' width='5.44' height='469.55' rx='2.72' fill='#0f0' />
+<rect x='1125.60' y='503.22' width='27.20' height='68.32' rx='2.72' fill='#f00' /><rect x='1136.48' y='486.14' width='5.44' height='136.64' rx='2.72' fill='#f00' />
+<rect x='1180.00' y='571.54' width='27.20' height='19.13' rx='2.72' fill='#f00' /><rect x='1190.88' y='566.76' width='5.44' height='38.26' rx='2.72' fill='#f00' />
+
+        </svg>
