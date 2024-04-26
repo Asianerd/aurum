@@ -1,0 +1,234 @@
+:root {
+    --primary: #f3cb67;
+}
+
+#parent {
+    width:calc(100% - 2ch);
+    margin:2ch;
+}
+
+#section-title {
+    margin: 0.5em 0;
+}
+
+#user-header {
+    display:flex;
+    justify-content: center;
+    align-items: center;
+
+    width:fit-content;
+    padding:2ch;
+
+    border-radius:var(--border-radius);
+
+    & img {
+        height:3em;
+        margin-right:2ch;
+    }
+}
+
+#balance {
+    display:flex;
+    justify-content: center;
+    align-items: center;
+
+    flex-direction: column;
+
+    width:100%;
+    padding:1em 0;
+
+    border-radius:var(--border-radius);
+
+    /* color:var(--primary); */
+
+    background:black;
+
+    /* background:var(--primary); */
+}
+
+#wallets {
+    display:flex;
+    justify-content: start;
+    align-items: start;
+
+    overflow-x: scroll;
+
+    & .wallet {
+        display:flex;
+        justify-content: center;
+        align-items: start;
+
+        flex-direction: column;
+
+        background:black;
+
+        width: max-content;
+        height:6em;
+
+        padding:1em 2em;
+        margin-right:2ch;
+
+        border-radius:var(--border-radius);
+
+        cursor:pointer;
+    }
+
+    & .wallet h3, & .wallet h4 {
+        white-space:nowrap;
+    }
+
+    & .wallet#main {
+        /* something here ig */
+    }
+
+    & .wallet#add {
+        background:none;
+        border-style:solid;
+        border-color: #333;
+
+        transition-duration:0.3s;
+
+        & img {
+            height:50%;
+
+            padding:1ch;
+
+            border-radius:1000px;
+
+            background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='100' ry='100' stroke='%23333' stroke-width='8' stroke-dasharray='10, 20' stroke-dashoffset='0' stroke-linecap='round'/%3e%3c/svg%3e");
+
+            /* background:red; */
+        }
+    }
+
+    & .wallet#add:hover {
+        border-color:#666;
+    }
+}
+
+#actions {
+    display:flex;
+    justify-content: start;
+    align-items: start;
+
+    margin-top:1em;
+
+    & > div {
+        display:flex;
+        justify-content: start;
+        align-items: center;
+
+        padding:1em 1.5em;
+        margin-right:2ch;
+
+        background:limegreen;
+
+        border-radius:var(--border-radius);
+
+        cursor:pointer;
+
+        & img {
+            height:2em;
+            margin-right:1ch;
+        }
+    }
+}
+
+#history-title {
+    display:flex;
+    justify-content: start;
+    align-items: center;
+
+    & #selection {
+        position:relative;
+
+        margin-left:2ch;
+
+        & > h5 {
+            background:var(--secondary);
+
+            padding:0.5em 1em;
+
+            border-radius:1000px;
+
+            font-style:italic;
+
+            cursor:pointer;
+
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        &:has(#choices[aria-label="open"]) h5 {
+            border-top-right-radius: 0 !important;
+            border-bottom-right-radius: 0 !important;
+        }
+
+        & #choices {
+            position:absolute;
+
+            left:100%;
+            top:0;
+
+            width:max-content;
+            padding:1em 1em;
+    
+            background:var(--secondary);
+            border-radius:var(--border-radius);
+
+            border-top-left-radius: 0;
+
+            display:none;
+
+            & h5 {
+                font-style:italic;
+
+                padding:0 0.3em;
+
+                cursor:pointer;
+            }
+
+            & h5:hover {
+                text-decoration: underline;
+            }
+
+            &[aria-label="open"] {
+                display:initial;
+            }
+        }
+    }
+}
+
+#history {
+    /* background:red; */
+
+    & table {
+        border:none;
+
+        border-collapse: collapse;
+    }
+
+    & .entry {
+
+        border-bottom-style:solid;
+        border-color:#fff5;
+        border-width:1px;
+
+        & td {
+            padding:0.5em 1ch;
+        }
+
+        & img#icon {
+            height:2.5em;
+        }
+
+        & #description {
+            font-style:italic;
+            color:#fff8;
+        }
+
+        &:last-of-type {
+            border-bottom-style:none;
+        }
+    }
+}

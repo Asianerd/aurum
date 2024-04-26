@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>aurum</title>
+        <link rel="shortcut icon" href="icon.ico">
+        <meta charset="utf-8">
+        <meta name="author" content="han_yuji_">
+        <link rel="stylesheet" href="/styles/style.css">
+        <link rel="stylesheet" href="./styles/homepage.css">
+    </head>
+    <body>
+        <div id="parent">
+            <div id="user-header">
+                <img src="/assets/profile.png">
+                <h2>han_yuji_</h2>
+            </div>
+            <div id="balance">
+                <h4>
+                    total balance
+                </h4>
+                <h3>
+                    RM120,000.00
+                </h3>
+            </div>
+            <div id="actions">
+                <div>
+                    <img src="/assets/transfer.png">
+                    <h4>transfer</h4>
+                </div>
+                <div>
+                    <img src="/assets/money.png">
+                    <h4>pay</h4>
+                </div>
+                <div>
+                    <img src="/assets/wallet.png">
+                    <h4>top up</h4>
+                </div>
+            </div>
+            <h4 id="section-title">
+                wallets
+            </h4>
+            <div id="wallets">
+                <div class="wallet" id="main" style="background:dodgerblue">
+                    <h4>
+                        wallet
+                    </h4>
+                    <h3>
+                        RM 80,000.00
+                    </h3>
+                </div>
+                <div class="wallet" style="background:limegreen">
+                    <h4>
+                        groceries
+                    </h4>
+                    <h3>
+                        RM 80,000.00
+                    </h3>
+                </div>
+                <div class="wallet" style="background:crimson">
+                    <h4>
+                        japan trip 2024 🏯
+                    </h4>
+                    <h3>
+                        RM 80,000.00
+                    </h3>
+                </div>
+                <div class="wallet" id="add">
+                    <img src="/assets/add.png">
+                </div>
+            </div>
+            <div id="history-title">
+                <h4 id="section-title">
+                    history
+                </h4>
+                <div id="selection">
+                    <h5 onclick="toggleDurationSelection()">
+                        Last 7 days
+                    </h5>
+                    <div id="choices" aria-label="closed">
+                        <h5 onclick="selectDuration(7)">Last 7 days</h5>
+                        <h5 onclick="selectDuration(14)">Last 2 week</h5>
+                        <h5 onclick="selectDuration(31)">Last month</h5>
+                        <h5 onclick="selectDuration(365)">Last year</h5>
+                        <h5 onclick="selectDuration('all')">All time</h5>
+                    </div>
+                </div>
+            </div>
+            <div id="history">
+                <table>
+                    <tr class="entry">
+                        <td><img id="icon" src="/assets/add.png"></td>
+                        <td>
+                            <div>
+                                <h4 id="amount">RM120.00</h4>
+                                <h5 id="description">- to groceries</h5>
+                            </div>
+                        </td>
+                        <td>
+                            <h4 id="sender">John Doe</h4>
+                        </td>
+                        <td>
+                            <h4 id="time">12/7/2024 16:00</h4>
+                        </td>
+                    </tr>
+                    <tr class="entry">
+                        <td><img id="icon" src="/assets/add.png"></td>
+                        <td>
+                            <div>
+                                <h4 id="amount">RM120.00</h4>
+                                <h5 id="description">- to groceries</h5>
+                            </div>
+                        </td>
+                        <td>
+                            <h4 id="sender">John Doe lorem ipsum dolor sit</h4>
+                        </td>
+                        <td>
+                            <h4 id="time">12/7/2024 16:00</h4>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <script src="/source.js"></script>
+        <script src="./scripts/homepage.js"></script>
+    </body>
+</html>
