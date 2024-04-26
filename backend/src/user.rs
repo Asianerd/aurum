@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use std::fs;
 use std::sync::Mutex;
 
+use rocket::http::Status;
 use rocket::request::Request;
 use rocket::data::{self, Data, FromData};
 use rocket::outcome::Outcome;
@@ -104,9 +105,15 @@ impl<'l> FromData<'l> for LoginInformation {
 
     async fn from_data(_req: &'l Request<'_>, mut data: Data<'l>) -> data::Outcome<'l, Self> {
         let result = data.peek(512).await.to_vec();
+
+        if result.is_empty() {
+            return Outcome::Failure((
+                Status::Ok,
+                LoginInfoParseError::Empty
+            ))
+        }
         
         let result = result.iter().map(|x| (x.clone()) as char).collect::<String>();
-
         let result: HashMap<String, String> = serde_json::from_str(result.as_str()).unwrap();
 
         Outcome::Success(LoginInformation {
@@ -120,7 +127,9 @@ impl<'l> FromData<'l> for LoginInformation {
 pub enum LoginInfoParseError {
     Success,
 
-    ParsingError
+    ParsingError,
+
+    Empty
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
@@ -131,7 +140,7 @@ pub enum LoginResult {
 
     PasswordWrong,
 
-    UsernameTaken
+    UsernameTaken,
 }
 
 

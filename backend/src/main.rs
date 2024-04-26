@@ -7,6 +7,7 @@ mod cors;
 
 mod account_handler;
 mod user;
+mod pin_handler;
 
 #[get("/")]
 pub fn index() -> String {
@@ -21,6 +22,8 @@ fn rocket() -> _ {
 
         .mount("/login", routes![user::login])
         .mount("/signup", routes![user::signup])
+
+        .mount("/verify_pin", routes![pin_handler::api_verify_pin])
 
         .attach(cors::CORS)
 }
