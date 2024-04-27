@@ -10,11 +10,14 @@ use rocket::State;
 use serde::{Deserialize, Serialize};
 
 use crate::account_handler::AccountHandler;
+use crate::utils;
+use crate::wallet::{Wallet, WalletResult};
 
-#[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct User {
     pub id: u128,
     pub username: String,
+    pub wallets: HashMap<u128, Wallet>
 }
 impl User {
     pub fn save(account_handler: &AccountHandler) {
@@ -51,7 +54,47 @@ impl User {
             .map(|(id, _)| *id)
             .next()
     }
+
+    // #region wallet
+    pub fn wallet_exists(&self, id: &u128) -> bool {
+        self.wallets.contains_key(&id)
+    }
+
+    pub fn alter_balance(&mut self, wallet_id: &u128, amount: &f64) -> WalletResult {
+        if !self.wallet_exists(&wallet_id) {
+            return WalletResult::WalletNoExist;
+        }
+        self.wallets.get_mut(&wallet_id).unwrap().alter_balance(*amount)
+    }
+
+    pub fn get_balance(&self, wallet_id: &u128) -> Result<f64, WalletResult> {
+        if !self.wallet_exists(wallet_id) {
+            return Err(WalletResult::WalletNoExist);
+        }
+        Ok(self.wallets.get(&wallet_id).unwrap().get_balance())
+    }
+
+    pub fn create_wallet(&mut self, name: String) {
+        let id = self.generate_wallet_id();
+        self.wallets.insert(id, Wallet {
+            id,
+            name,
+            balance: 0f64,
+            colour: 0,
+            limit: (0f64, 0f64)
+        });
+    }
+
+    fn generate_wallet_id(&self) -> u128 {
+        self.wallets.iter().map(|(i, _)| i).max().map_or(0, |i| i + 1)
+    }
+    // #endregion
 }
+// #[derive(Clone, Copy, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
+// pub enum Species {
+//     Customer,
+//     Vendor
+// }
 
 
 
@@ -90,7 +133,8 @@ impl LoginInformation {
         let id = User::generate_user_id(account_handler);
         account_handler.users.insert(id, User {
             id,
-            username: self.username.clone()
+            username: self.username.clone(),
+            wallets: HashMap::from([(0, Wallet::default_wallet())])
         });
         LoginInformation::add_password(id, &self.password);
         account_handler.save();
@@ -156,5 +200,75 @@ pub fn login(db: &State<Mutex<AccountHandler>>, login: LoginInformation) -> Stri
 pub fn signup(db: &State<Mutex<AccountHandler>>, login: LoginInformation) -> String {
     let mut db = db.lock().unwrap();
     serde_json::to_string(&login.signup(&mut db)).unwrap()
+}
+
+#[post("/<name>", data="<login>")]
+pub fn create_wallet(db: &State<Mutex<AccountHandler>>, login: LoginInformation, name: String) -> String {
+    let mut db = db.lock().unwrap();
+    let result = login.login(&db);
+    match result {
+        LoginResult::Success(user_id) => {
+            db.users.get_mut(&user_id).unwrap().create_wallet(name);
+            utils::parse_response_to_string(Ok("success"))
+        },
+        _ => utils::parse_response_to_string(Err(result))
+    }
+}
+
+#[post("/", data="<login>")]
+pub fn get_wallets(db: &State<Mutex<AccountHandler>>, login: LoginInformation) -> String {
+    let db = db.lock().unwrap();
+    let result = login.login(&db);
+    match result {
+        LoginResult::Success(user_id) => {
+            let mut w = db.users.get(&user_id).unwrap().wallets
+                .values()
+                .map(|w| w.clone())
+                .collect::<Vec<Wallet>>();
+            w.sort_by_key(|w| w.id);
+            utils::parse_response_to_string(Ok(w))
+        },
+        _ => utils::parse_response_to_string(Err(result))
+    }
+}
+
+#[post("/", data="<login>")]
+pub fn get_total_balance(db: &State<Mutex<AccountHandler>>, login: LoginInformation) -> String {
+    let db = db.lock().unwrap();
+    let result = login.login(&db);
+    match result {
+        LoginResult::Success(user_id) => utils::parse_response_to_string(
+            Ok(db.users.get(&user_id).unwrap().wallets
+                .values()
+                .map(|w| w.get_balance())
+                .sum::<f64>()
+            )
+        ),
+        _ => utils::parse_response_to_string(Err(result))
+    }
+}
+
+#[post("/<wallet_id>", data="<login>")]
+pub fn get_balance(db: &State<Mutex<AccountHandler>>, login: LoginInformation, wallet_id: u128) -> String {
+    let db = db.lock().unwrap();
+    let result = login.login(&db);
+    match result {
+        LoginResult::Success(user_id) => {
+            utils::parse_response_to_string(Ok(db.users.get(&user_id).unwrap().get_balance(&wallet_id)))
+        },
+        _ => utils::parse_response_to_string(Err(&result))
+    }
+}
+
+#[post("/<wallet_id>/<amount>", data="<login>")]
+pub fn alter_balance(db: &State<Mutex<AccountHandler>>, login: LoginInformation, wallet_id: u128, amount: f64) -> String {
+    let mut db = db.lock().unwrap();
+    let result = login.login(&db);
+    match result {
+        LoginResult::Success(user_id) => {
+            utils::parse_response_to_string(Ok(db.users.get_mut(&user_id).unwrap().alter_balance(&wallet_id, &amount)))
+        },
+        _ => utils::parse_response_to_string(Err(&result))
+    }
 }
 // #endregion

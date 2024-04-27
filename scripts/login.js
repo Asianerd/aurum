@@ -44,6 +44,8 @@ async function signup() {
     }), (r) => {
         var response = JSON.parse(r);
 
+        console.log(response);
+
         if (Object.keys(response)[0] == "Success") {
             setLocalStorage("aurum_username", username);
             setLocalStorage("aurum_password", password);
@@ -58,6 +60,6 @@ async function signup() {
             "Success": "",
 
             "UsernameTaken": "username is already taken"
-        }[Object.keys(response)[0]];
+        }[response];
     })
 }

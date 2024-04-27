@@ -26,7 +26,7 @@ pub fn register_pin(account_handler: &AccountHandler, login: &LoginInformation, 
     match result {
         LoginResult::Success(id) => {
             let mut pins: HashMap<u128, u8> = serde_json::from_str(fs::read_to_string("data/pins.json").unwrap().as_str()).unwrap();
-            pins.insert(id, pin);
+            pins.insert(id,pin);
             Ok(PinResult::Success)
         },
         _ => Err(result)
@@ -50,10 +50,6 @@ pub fn api_register_pin(db: &State<Mutex<AccountHandler>>, login: LoginInformati
     match result {
         Ok(r) => utils::parse_response(Ok(serde_json::to_string(&r).unwrap())),
         Err(e) => utils::parse_response(Err(serde_json::to_string(&e).unwrap()))
-
-        // LoginResult::Success(id) => {
-        // }utils::parse_response(Ok(serde_json::to_string(&result).unwrap())),
-        // _ => utils::parse_response(Ok(serde_json::to_string(&result).unwrap()))
     }
 }
 

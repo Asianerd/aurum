@@ -1,6 +1,38 @@
 {
   "0": {
     "id": 0,
-    "username": "han_yuji_"
+    "username": "han_yuji_",
+    "wallets": {
+      "0": {
+        "id": 0,
+        "name": "wallet",
+        "balance": 80000.0,
+        "colour": 0,
+        "limit": [
+          0.0,
+          0.0
+        ]
+      },
+      "1": {
+        "id": 1,
+        "name": "groceries",
+        "balance": 240000.0,
+        "colour": 2,
+        "limit": [
+          0.0,
+          0.0
+        ]
+      },
+      "3": {
+        "id": 3,
+        "name": "trip to korea 🇰🇷",
+        "balance": 10000.0,
+        "colour": 1,
+        "limit": [
+          0.0,
+          0.0
+        ]
+      }
+    }
   }
 }

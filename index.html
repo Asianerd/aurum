@@ -9,10 +9,34 @@
         <link rel="stylesheet" href="./styles/homepage.css">
     </head>
     <body>
+        <div id="overlay">
+            <div id="wallet-creation" aria-label="closed">
+                <input type="text" placeholder="wallet name">
+                <div id="limits">
+                    <label><h4>add limits</h4><input type=checkbox></label>
+                    <div>
+                        <h5>$</h5>
+                        <input type="number" placeholder="none">
+                        <h5>to $</h5>
+                        <input type="number" placeholder="none">
+                    </div>
+                </div>
+                <div>
+                    <div id="colour-selection">
+                        <img src="/assets/colour_wheel.png" onclick="toggleWalletColourThemes()">
+                        <div id="colours" aria-label="closed">
+                            <hr><hr><hr><hr><hr><hr><hr><hr><hr><hr><hr><hr><hr><hr><hr><hr><hr><hr><hr><hr><hr><hr><hr><hr><hr><hr><hr><hr><hr><hr>
+                        </div>
+                    </div>
+                    <h3 id="create-button">create</h3>
+                </div>
+                <img src="/assets/cross.png" id="exit-button" onclick="toggleWalletCreate(false)">
+            </div>
+        </div>
         <div id="parent">
             <div id="user-header">
                 <img src="/assets/profile.png">
-                <h2>han_yuji_</h2>
+                <h2 id="username"></h2>
             </div>
             <div id="balance">
                 <h4>
