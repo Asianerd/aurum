@@ -29,11 +29,11 @@ fn rocket() -> _ {
         .mount("/verify_pin", routes![pin_handler::api_verify_pin])
         .mount("/register_pin", routes![pin_handler::api_register_pin])
 
-        .mount("/wallet/get_wallets", routes![user::get_wallets])
-        .mount("/wallet/get_balance", routes![user::get_balance])
-        .mount("/wallet/get_total_balance", routes![user::get_total_balance])
-        .mount("/wallet/alter_balance", routes![user::alter_balance])
-        .mount("/wallet/create_wallet", routes![user::create_wallet])
+        .mount("/wallet/get_wallets", routes![wallet::get_wallets])
+        .mount("/wallet/get_balance", routes![wallet::get_balance])
+        .mount("/wallet/get_total_balance", routes![wallet::get_total_balance])
+        .mount("/wallet/alter_balance", routes![wallet::alter_balance])
+        .mount("/wallet/create_wallet", routes![wallet::create_wallet])
 
         .attach(cors::CORS)
 }

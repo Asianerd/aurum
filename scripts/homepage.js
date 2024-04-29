@@ -50,8 +50,19 @@ function toggleWalletCreate(b=null) {
 }
 
 // #region colours
+// lazy to scope nicely
+let _c = document.querySelector("#overlay #wallet-creation #colours");
+_c.innerHTML = '';
+colour_themes.forEach((e, i) => {
+    _c.innerHTML += `<hr onclick="walletColourSelect(${i})" style="background:${e}">`;
+})
+
 function toggleWalletColourThemes() {
     document.querySelector("#wallet-creation #colour-selection #colours").ariaLabel = document.querySelector("#wallet-creation #colour-selection #colours").ariaLabel == "open" ? "closed" : "open";
+}
+
+function toggleWalletDurationSelection() {
+    document.querySelector("#wallet-creation #duration-selection").ariaLabel = document.querySelector("#wallet-creation #duration-selection").ariaLabel == "open" ? "closed" : "open";
 }
 
 function walletColourSelect(i) {
@@ -59,14 +70,15 @@ function walletColourSelect(i) {
     document.querySelector("#overlay #wallet-creation").dataset.colour = i;
 }
 
-// lazy to scope nicely
-let _c = document.querySelector("#overlay #wallet-creation #colours");
-_c.innerHTML = '';
-colour_themes.forEach((e, i) => {
-    _c.innerHTML += `<hr onclick="walletColourSelect(${i})" style="background:${e}">`;
-})
+function selectWalletDuration(t) {
+    document.querySelector("#wallet-creation #duration-selection > h5").innerHTML = t;
+    toggleWalletDurationSelection();
+}
+
+walletColourSelect(0);
 // #endregion
 
+// #region information updating
 function updateInformation() {
     populateWallets();
     updateTotalBalance();
@@ -98,3 +110,45 @@ function updateTotalBalance() {
 }
 
 updateInformation();
+// #endregion
+
+// #region wallet
+function validateCreateWallet() {
+    let flag = true;
+    let name = document.querySelector("#wallet-creation > input[type=text]").value;
+    let colour = document.querySelector("#wallet-creation").dataset.colour;
+
+    if (!name) {
+        flag = false;
+    }
+    if (colour == undefined) {
+        flag = false;
+    }
+
+    document.querySelector("#wallet-creation #create-button").ariaLabel = flag ? "enabled" : "disabled";
+    return flag;
+}
+
+validateCreateWallet();
+
+function createWallet() {
+    if (!validateCreateWallet()) {
+        return;
+    }
+
+    let name = document.querySelector("#wallet-creation > input[type=text]").value;
+    let colour = document.querySelector("#wallet-creation").dataset.colour;
+    let limit = document.querySelector("#wallet-creation #limits > input[type=number]:first-of-type").value;
+
+    // [limits[0], limits[1]] = limits[0] < limits[1] ? [limits[0], limits[1]] : [limits[1], limits[0]];
+
+    let params = `${name}/${colour}/${limits}`;
+
+    sendPostRequest(`${BACKEND_ADDRESS}/wallet/create_wallet/${params}`, login_info(), () => {
+        updateInformation();
+
+        toggleWalletCreate(false);
+    })
+}
+// #endregion
+

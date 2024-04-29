@@ -11,24 +11,27 @@
     <body>
         <div id="overlay">
             <div id="wallet-creation" aria-label="closed">
-                <input type="text" placeholder="wallet name">
+                <input type="text" placeholder="wallet name" onkeyup="validateCreateWallet()">
                 <div id="limits">
-                    <label><h4>add limits</h4><input type=checkbox></label>
-                    <div>
-                        <h5>$</h5>
-                        <input type="number" placeholder="none">
-                        <h5>to $</h5>
-                        <input type="number" placeholder="none">
+                    <div id="duration-selection" aria-label="open">
+                        <h5 onclick="toggleWalletDurationSelection()">
+                            daily
+                        </h5>
+                        <div id="choices">
+                            <h5 onclick="selectWalletDuration('daily')">daily</h5>
+                            <h5 onclick="selectWalletDuration('weekly')">weekly</h5>
+                            <h5 onclick="selectWalletDuration('monthly')">monthly</h5>
+                        </div>
                     </div>
+                    <h5>limit : $</h5>
+                    <input type="number" placeholder="none" onkeyup="validateCreateWallet()">
                 </div>
                 <div>
                     <div id="colour-selection">
                         <img src="/assets/colour_wheel.png" onclick="toggleWalletColourThemes()">
-                        <div id="colours" aria-label="closed">
-                            <hr><hr><hr><hr><hr><hr><hr><hr><hr><hr><hr><hr><hr><hr><hr><hr><hr><hr><hr><hr><hr><hr><hr><hr><hr><hr><hr><hr><hr><hr>
-                        </div>
+                        <div id="colours" aria-label="closed"></div>
                     </div>
-                    <h3 id="create-button">create</h3>
+                    <h3 id="create-button" aria-label="enabled" onclick="createWallet()" >create</h3>
                 </div>
                 <img src="/assets/cross.png" id="exit-button" onclick="toggleWalletCreate(false)">
             </div>

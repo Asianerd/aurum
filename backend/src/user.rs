@@ -11,7 +11,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::account_handler::AccountHandler;
 use crate::utils;
-use crate::wallet::{Wallet, WalletResult};
+use crate::wallet::{Wallet, WalletLimit, WalletResult};
 
 #[derive(Clone, Serialize, Deserialize)]
 pub struct User {
@@ -74,15 +74,29 @@ impl User {
         Ok(self.wallets.get(&wallet_id).unwrap().get_balance())
     }
 
-    pub fn create_wallet(&mut self, name: String) {
+    pub fn create_wallet(&mut self, name: String, colour: u128, limit: WalletLimit) {
         let id = self.generate_wallet_id();
         self.wallets.insert(id, Wallet {
             id,
             name,
             balance: 0f64,
-            colour: 0,
-            limit: (0f64, 0f64)
+            colour,
+            limit
         });
+    }
+
+    pub fn delete_wallet(&mut self, wallet_id: &u128) -> WalletResult {
+        if !self.wallet_exists(wallet_id) {
+            return WalletResult::WalletNoExist;
+        }
+
+        let balance = self.get_balance(wallet_id).unwrap();
+        self.alter_balance(&0, &balance);
+        // move all money to the general wallet
+
+        self.wallets.remove(&wallet_id);
+
+        WalletResult::Success
     }
 
     fn generate_wallet_id(&self) -> u128 {
@@ -200,75 +214,5 @@ pub fn login(db: &State<Mutex<AccountHandler>>, login: LoginInformation) -> Stri
 pub fn signup(db: &State<Mutex<AccountHandler>>, login: LoginInformation) -> String {
     let mut db = db.lock().unwrap();
     serde_json::to_string(&login.signup(&mut db)).unwrap()
-}
-
-#[post("/<name>", data="<login>")]
-pub fn create_wallet(db: &State<Mutex<AccountHandler>>, login: LoginInformation, name: String) -> String {
-    let mut db = db.lock().unwrap();
-    let result = login.login(&db);
-    match result {
-        LoginResult::Success(user_id) => {
-            db.users.get_mut(&user_id).unwrap().create_wallet(name);
-            utils::parse_response_to_string(Ok("success"))
-        },
-        _ => utils::parse_response_to_string(Err(result))
-    }
-}
-
-#[post("/", data="<login>")]
-pub fn get_wallets(db: &State<Mutex<AccountHandler>>, login: LoginInformation) -> String {
-    let db = db.lock().unwrap();
-    let result = login.login(&db);
-    match result {
-        LoginResult::Success(user_id) => {
-            let mut w = db.users.get(&user_id).unwrap().wallets
-                .values()
-                .map(|w| w.clone())
-                .collect::<Vec<Wallet>>();
-            w.sort_by_key(|w| w.id);
-            utils::parse_response_to_string(Ok(w))
-        },
-        _ => utils::parse_response_to_string(Err(result))
-    }
-}
-
-#[post("/", data="<login>")]
-pub fn get_total_balance(db: &State<Mutex<AccountHandler>>, login: LoginInformation) -> String {
-    let db = db.lock().unwrap();
-    let result = login.login(&db);
-    match result {
-        LoginResult::Success(user_id) => utils::parse_response_to_string(
-            Ok(db.users.get(&user_id).unwrap().wallets
-                .values()
-                .map(|w| w.get_balance())
-                .sum::<f64>()
-            )
-        ),
-        _ => utils::parse_response_to_string(Err(result))
-    }
-}
-
-#[post("/<wallet_id>", data="<login>")]
-pub fn get_balance(db: &State<Mutex<AccountHandler>>, login: LoginInformation, wallet_id: u128) -> String {
-    let db = db.lock().unwrap();
-    let result = login.login(&db);
-    match result {
-        LoginResult::Success(user_id) => {
-            utils::parse_response_to_string(Ok(db.users.get(&user_id).unwrap().get_balance(&wallet_id)))
-        },
-        _ => utils::parse_response_to_string(Err(&result))
-    }
-}
-
-#[post("/<wallet_id>/<amount>", data="<login>")]
-pub fn alter_balance(db: &State<Mutex<AccountHandler>>, login: LoginInformation, wallet_id: u128, amount: f64) -> String {
-    let mut db = db.lock().unwrap();
-    let result = login.login(&db);
-    match result {
-        LoginResult::Success(user_id) => {
-            utils::parse_response_to_string(Ok(db.users.get_mut(&user_id).unwrap().alter_balance(&wallet_id, &amount)))
-        },
-        _ => utils::parse_response_to_string(Err(&result))
-    }
 }
 // #endregion
