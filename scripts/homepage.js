@@ -27,6 +27,8 @@ function login_info() {
     });
 }
 
+document.querySelector("#parent #username").innerHTML = username;
+
 function toggleDurationSelection() {
     let e = document.querySelector("#selection #choices");
     e.ariaLabel = e.ariaLabel == "open" ? "closed" : "open";
@@ -138,11 +140,17 @@ function createWallet() {
 
     let name = document.querySelector("#wallet-creation > input[type=text]").value;
     let colour = document.querySelector("#wallet-creation").dataset.colour;
-    let limit = document.querySelector("#wallet-creation #limits > input[type=number]:first-of-type").value;
+    let limit = document.querySelector("#wallet-creation #limits > input[type=number]").value;
+    let limit_type = document.querySelector("#wallet-creation #limits #duration-selection > h5:first-of-type").innerHTML;
 
-    // [limits[0], limits[1]] = limits[0] < limits[1] ? [limits[0], limits[1]] : [limits[1], limits[0]];
+    if ((limit == '') || (limit == 0)) {
+        limit_type = "Unlimited";
+        limit = 0;
+    }
 
-    let params = `${name}/${colour}/${limits}`;
+    let params = `${name}/${colour}/${limit_type}/${limit}`;
+
+    console.log(params);
 
     sendPostRequest(`${BACKEND_ADDRESS}/wallet/create_wallet/${params}`, login_info(), () => {
         updateInformation();

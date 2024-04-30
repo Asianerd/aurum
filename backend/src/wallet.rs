@@ -1,10 +1,10 @@
-use std::sync::Mutex;
+use std::{str::FromStr, sync::Mutex};
 
 use rocket::State;
 use serde::{Deserialize, Serialize};
 use strum_macros::EnumString;
 
-use crate::{account_handler::AccountHandler, user::{LoginInformation, LoginResult}, utils};
+use crate::{account_handler::AccountHandler, user::{self, LoginInformation, LoginResult}, utils};
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Wallet {
@@ -14,8 +14,10 @@ pub struct Wallet {
     pub balance: f64,
     pub colour: u128,
 
-    pub limit: WalletLimit
+    pub limit: WalletLimit,
     // disable removing money if reached limit
+
+    pub expenditure: f64, // total expenditure since start of limit
 }
 impl Wallet {
     pub fn default_wallet() -> Wallet {
@@ -25,12 +27,25 @@ impl Wallet {
             name: "wallet".to_string(),
             balance: 0f64,
             colour: 0,
-            limit: WalletLimit::Unlimited
+            limit: WalletLimit::Unlimited,
+            expenditure: 0f64
         }
     }
 
     pub fn get_balance(&self) -> f64 {
         self.balance
+    }
+
+    pub fn can_alter_balance(&self, amount: f64) -> WalletResult {
+        let mut n = self.balance.clone();
+        n += amount;
+        if n < 0f64 {
+            return WalletResult::InsufficientAmount;
+        }
+        if (self.get_limit() != 0f64) && (self.expenditure + amount) > self.get_limit() {
+            return WalletResult::ReachedLimit;
+        }
+        WalletResult::Success
     }
 
     pub fn alter_balance(&mut self, amount: f64) -> WalletResult {
@@ -39,25 +54,38 @@ impl Wallet {
         if n < 0f64 {
             return WalletResult::InsufficientAmount;
         }
-        self.balance = n;
+        println!("{} : {}", self.balance, amount);
+        self.balance = n.clone();
+        println!("{} : {}", self.balance, amount);
         WalletResult::Success
     }
+
+    pub fn get_limit(&self) -> f64 {
+        match self.limit {
+            WalletLimit::Daily(i) => i,
+            WalletLimit::Weekly(i) => i,
+            WalletLimit::Monthly(i) => i,        
+            _ => 0f64
+        }
+    }
 }
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub enum WalletResult {
     Success,
 
     WalletNoExist,
 
-    InsufficientAmount
+    InsufficientAmount,
+    ReachedLimit
 }
 
 #[derive(Debug, Serialize, Deserialize, EnumString, Clone)]
+#[strum(serialize_all="lowercase")]
 pub enum WalletLimit {
     Unlimited,
-    Daily(f64),
-    Weekly(f64),
-    Monthly(f64)
+    Daily(f64), // timer resets at 0 GMT
+    Weekly(f64), // timer reset every monday 0 gmt
+    Monthly(f64) // timer resets every first of the month
 }
 
 
@@ -70,8 +98,15 @@ pub fn create_wallet(db: &State<Mutex<AccountHandler>>, login: LoginInformation,
     let result = login.login(&db);
     match result {
         LoginResult::Success(user_id) => {
-            // TODO : finishe this
-            db.users.get_mut(&user_id).unwrap().create_wallet(name, colour, (lower, upper));
+            db.users.get_mut(&user_id).unwrap().create_wallet(name, colour, match WalletLimit::from_str(&limit_type) {
+                Ok(t) => match t {
+                    WalletLimit::Daily(_) => WalletLimit::Daily(limit),
+                    WalletLimit::Weekly(_) => WalletLimit::Weekly(limit),
+                    WalletLimit::Monthly(_) => WalletLimit::Monthly(limit),
+                    _ => WalletLimit::Unlimited
+                },
+                Err(_) => WalletLimit::Unlimited
+            });
             db.save();
             utils::parse_response_to_string(Ok("success"))
         },
@@ -142,10 +177,21 @@ pub fn alter_balance(db: &State<Mutex<AccountHandler>>, login: LoginInformation,
     let result = login.login(&db);
     match result {
         LoginResult::Success(user_id) => {
-            utils::parse_response_to_string(Ok(db.users.get_mut(&user_id).unwrap().alter_balance(&wallet_id, &amount)))
-
+            let r = utils::parse_response_to_string(Ok(db.users.get_mut(&user_id).unwrap().alter_balance(&wallet_id, &amount)));
+            db.save();
+            r
         },
         _ => utils::parse_response_to_string(Err(&result))
+    }
+}
+
+#[post("/<from_wallet>/<to_user>/<to_wallet>/<amount>", data="<login>")]
+pub fn transfer_balance(db: &State<Mutex<AccountHandler>>, login: LoginInformation, from_wallet: u128, to_user: u128, to_wallet: u128, amount: f64) -> String {
+    let mut db = db.lock().unwrap();
+    let result =  login.login(&db);
+    match result {
+        LoginResult::Success(user_id) => utils::parse_response_to_string(Ok(user::User::transfer_balance(&mut db, to_user, to_wallet, user_id, from_wallet, amount))),
+        _ => utils::parse_response_to_string(Err(result))
     }
 }
 // #endregion

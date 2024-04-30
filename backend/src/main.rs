@@ -25,6 +25,7 @@ fn rocket() -> _ {
 
         .mount("/login", routes![user::login])
         .mount("/signup", routes![user::signup])
+        .mount("/lookup_username", routes![user::get_user_id])
 
         .mount("/verify_pin", routes![pin_handler::api_verify_pin])
         .mount("/register_pin", routes![pin_handler::api_register_pin])
@@ -34,6 +35,7 @@ fn rocket() -> _ {
         .mount("/wallet/get_total_balance", routes![wallet::get_total_balance])
         .mount("/wallet/alter_balance", routes![wallet::alter_balance])
         .mount("/wallet/create_wallet", routes![wallet::create_wallet])
+        .mount("/wallet/transfer_balance", routes![wallet::transfer_balance])
 
         .attach(cors::CORS)
 }

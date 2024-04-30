@@ -1,4 +1,18 @@
 {
+  "1": {
+    "id": 1,
+    "username": "lorem",
+    "wallets": {
+      "0": {
+        "id": 0,
+        "name": "wallet",
+        "balance": 200.0,
+        "colour": 0,
+        "limit": "Unlimited",
+        "expenditure": 0.0
+      }
+    }
+  },
   "0": {
     "id": 0,
     "username": "han_yuji_",
@@ -6,12 +20,10 @@
       "0": {
         "id": 0,
         "name": "wallet",
-        "balance": 80000.0,
+        "balance": 0.0,
         "colour": 0,
-        "limit": [
-          0.0,
-          0.0
-        ]
+        "limit": "Unlimited",
+        "expenditure": 0.0
       }
     }
   }

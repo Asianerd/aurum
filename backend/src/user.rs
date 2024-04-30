@@ -67,6 +67,36 @@ impl User {
         self.wallets.get_mut(&wallet_id).unwrap().alter_balance(*amount)
     }
 
+    pub fn transfer_balance(db: &mut AccountHandler, to: u128, to_wallet_id: u128, from: u128, from_wallet_id: u128, amount: f64) -> Result<WalletResult, LoginResult> {
+        // assumption that amount is positive
+        let from_user = match db.users.get(&from) {
+            Some(u) => u,
+            None => return Err(LoginResult::UsernameNoExist)
+        };
+        let from_wallet = if from_user.wallet_exists(&from_wallet_id) { from_user.wallets.get(&from_wallet_id).unwrap() } else { return Ok(WalletResult::WalletNoExist) };
+        let from_result = from_wallet.can_alter_balance(-amount);
+        if from_result != WalletResult::Success {
+            return Ok(from_result);
+        }
+
+        let to_user = match db.users.get(&from) {
+            Some(u) => u,
+            None => return Err(LoginResult::UsernameNoExist)
+        };
+        let to_wallet = if to_user.wallet_exists(&to_wallet_id) { to_user.wallets.get(&to_wallet_id).unwrap() } else { return Ok(WalletResult::WalletNoExist) };
+        let to_result = to_wallet.can_alter_balance(amount);
+        if to_result != WalletResult::Success {
+            return Ok(to_result);
+        }
+
+        // guard clauses after guard clauses
+
+        db.users.get_mut(&from).unwrap().alter_balance(&from_wallet_id, &((-amount).clone()));
+        db.users.get_mut(&to).unwrap().alter_balance(&to_wallet_id, &amount);
+
+        Ok(WalletResult::Success)
+    }
+
     pub fn get_balance(&self, wallet_id: &u128) -> Result<f64, WalletResult> {
         if !self.wallet_exists(wallet_id) {
             return Err(WalletResult::WalletNoExist);
@@ -81,7 +111,8 @@ impl User {
             name,
             balance: 0f64,
             colour,
-            limit
+            limit,
+            expenditure: 0f64
         });
     }
 
@@ -214,5 +245,15 @@ pub fn login(db: &State<Mutex<AccountHandler>>, login: LoginInformation) -> Stri
 pub fn signup(db: &State<Mutex<AccountHandler>>, login: LoginInformation) -> String {
     let mut db = db.lock().unwrap();
     serde_json::to_string(&login.signup(&mut db)).unwrap()
+}
+
+#[get("/<username>")]
+pub fn get_user_id(db: &State<Mutex<AccountHandler>>, username: String) -> String {
+    let db = db.lock().unwrap();
+    let result = User::lookup_user_id(&db, &username);
+    match result {
+        Some(id) => utils::parse_response_to_string(Ok(id)),
+        None => utils::parse_response_to_string(Err(result))
+    }
 }
 // #endregion
