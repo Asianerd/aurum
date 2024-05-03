@@ -1,8 +1,9 @@
 use std::{collections::HashMap, sync::Mutex};
 
+use rand::rngs::ThreadRng;
 use rocket::State;
 
-use crate::user::User;
+use crate::{user::{self, User}, utils, wallet};
 
 pub struct AccountHandler {
     pub users: HashMap<u128, User>
@@ -39,5 +40,25 @@ pub fn save(db: &State<Mutex<AccountHandler>>) -> String {
     let db = db.lock().unwrap();
     db.save();
     "success".to_string()
+}
+
+#[get("/<number>")]
+pub fn generate_users(db: &State<Mutex<AccountHandler>>, number: usize) -> String {
+    let mut db = db.lock().unwrap();
+    for _ in 0..number {
+        let id = user::User::generate_user_id(&db);
+        db.users.insert(id, user::User {
+            id,
+            username: utils::generate_name(&mut rand::thread_rng()),
+            wallets: HashMap::from([(0, wallet::Wallet::default_wallet())])
+        });
+    }
+    "success".to_string()
+}
+
+#[get("/")]
+pub fn debug(db: &State<Mutex<AccountHandler>>) -> String {
+    let db = db.lock().unwrap();
+    serde_json::to_string_pretty(&db.users).unwrap()
 }
 // #endregion

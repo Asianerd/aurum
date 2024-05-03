@@ -10,7 +10,17 @@
     </head>
     <body>
         <div id="overlay">
-            
+            <div id="transfer-result" aria-label="closed">
+                <h3 id="header">
+                    huh
+                </h3>
+                <h4 id="description">
+                    youre not supposed to see this
+                </h4>
+                <h4 onclick="toggleTransferResult(false)">
+                    close
+                </h4>
+            </div>
         </div>
         <div id="parent">
             <!-- <div id="user-header">
@@ -18,6 +28,12 @@
                 <h3 id="username"></h3>
             </div> -->
             <div id="header">
+                <a href="./index.html" id="return">
+                    <img src="/assets/left_chevron.png">
+                    <h5>
+                        return
+                    </h5>
+                </a>
                 <h3>transfer</h3>
                 <img src="/assets/qr_code.png">
             </div>
@@ -25,10 +41,11 @@
                 <div id="user-section">
                     <img src="/assets/profile.png">
                     <h4 id="username">username</h4>
+                    <h5 id="code">#1234-1234</h5>
                 </div>
                 <div id="wallet-section">
                     <div id="wallet-select" aria-label="closed">
-                        <h4>savings</h4>
+                        <h4 onclick="toggleWalletChoices()">savings</h4>
                         <div id="choices">
                             <h4>wallet</h4>
                             <h4>savings</h4>
@@ -42,16 +59,31 @@
             </div>
             <div id="transfer-amount">
                 <h4>$</h4>
-                <input type="number">
+                <input onkeyup="validateTransfer();" type="number">
             </div>
-            <div id="destination">
-                <input type="text">
-                <div class="query-result">
-                    <div class="user">
+            <div id="destination" aria-label="open">
+                <div id="query-input">
+                    <input onchange="queryUser()" type="text" placeholder="username/ID">
+                    <img onclick="queryUser()" src="/assets/search.png">
+                </div>
+                <div id="query-result">
+                    <div class="user" onclick="selectUser(this, 0)">
                         <img src="/assets/profile.png">
-                        <h4>finish this part</h4>
+                        <div id="credentials">
+                            <h4>lorem ipsum dolor</h4>
+                            <h5 id="code">#95a3-4124</h5>
+                        </div>
+                    </div>
+                    <div class="user" onclick="selectUser(this, 1)">
+                        <img src="/assets/profile.png">
+                        <h4>sit amet consectetuer</h4>
                     </div>
                 </div>
+            </div>
+            <div id="confirmation">
+                <h4 onclick="submitTransfer()">
+                    transfer
+                </h4>
             </div>
         </div>
         <script src="/source.js"></script>

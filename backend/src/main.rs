@@ -22,10 +22,14 @@ fn rocket() -> _ {
         .mount("/", routes![index])
         .mount("/save", routes![account_handler::save])
         .mount("/load", routes![account_handler::load])
+        .mount("/generate_users", routes![account_handler::generate_users])
+        .mount("/debug", routes![account_handler::debug])
 
         .mount("/login", routes![user::login])
         .mount("/signup", routes![user::signup])
         .mount("/lookup_username", routes![user::get_user_id])
+        .mount("/query_users", routes![user::query_users])
+        .mount("/get_code", routes![user::get_code])
 
         .mount("/verify_pin", routes![pin_handler::api_verify_pin])
         .mount("/register_pin", routes![pin_handler::api_register_pin])
