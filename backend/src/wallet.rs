@@ -54,9 +54,13 @@ impl Wallet {
         if n < 0f64 {
             return WalletResult::InsufficientAmount;
         }
-        println!("{} : {}", self.balance, amount);
         self.balance = n.clone();
-        println!("{} : {}", self.balance, amount);
+
+        if amount < 0f64 {
+            self.expenditure += amount.abs();
+        }
+        // TODO : implement ReachedLimit wallet result
+
         WalletResult::Success
     }
 
@@ -66,6 +70,22 @@ impl Wallet {
             WalletLimit::Weekly(i) => i,
             WalletLimit::Monthly(i) => i,        
             _ => 0f64
+        }
+    }
+
+    //                              progress, limit
+    pub fn get_limit_progress(&self) -> (f64, f64) {
+        let limit = self.get_limit();
+        (self.expenditure, limit)
+    }
+
+    pub fn surpassed_limit(&self) -> bool {
+        match self.limit {
+            WalletLimit::Unlimited => false,
+            _ => {
+                let progress = self.get_limit_progress();
+                progress.0 >= progress.1
+            }
         }
     }
 }
@@ -191,6 +211,21 @@ pub fn transfer_balance(db: &State<Mutex<AccountHandler>>, login: LoginInformati
     let result =  login.login(&db);
     match result {
         LoginResult::Success(user_id) => utils::parse_response_to_string(Ok(user::User::transfer_balance(&mut db, to_user, to_wallet, user_id, from_wallet, amount))),
+        _ => utils::parse_response_to_string(Err(result))
+    }
+}
+
+#[post("/<wallet_id>", data="<login>")]
+pub fn get_limit(db: &State<Mutex<AccountHandler>>, login: LoginInformation, wallet_id: u128) -> String {
+    let db = db.lock().unwrap();
+    let result = login.login(&db);
+    match result {
+        LoginResult::Success(user_id) => {
+            utils::parse_response_to_string(Ok(match db.users.get(&user_id).unwrap().wallets.get(&wallet_id) {
+                Some(w) => w.get_limit_progress(),
+                None => (0f64, 0f64)
+            }))
+        },
         _ => utils::parse_response_to_string(Err(result))
     }
 }

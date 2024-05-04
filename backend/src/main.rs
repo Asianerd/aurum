@@ -40,6 +40,7 @@ fn rocket() -> _ {
         .mount("/wallet/alter_balance", routes![wallet::alter_balance])
         .mount("/wallet/create_wallet", routes![wallet::create_wallet])
         .mount("/wallet/transfer_balance", routes![wallet::transfer_balance])
+        .mount("/wallet/get_limit", routes![wallet::get_limit])
 
         .attach(cors::CORS)
 }

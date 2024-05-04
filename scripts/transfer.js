@@ -136,6 +136,12 @@ function selectWallet(id) {
     document.querySelector("#wallet-section > h4").innerHTML = `with ${currencyFormatter.format(target['balance'])}`;
 
     toggleWalletChoices();
+
+    sendPostRequest(`${BACKEND_ADDRESS}/wallet/get_limit/${selectedWallet}`, login_info(), (r) => {
+        let response = JSON.parse(parseResponse(r));
+
+        console.log(response);
+    })
 }
 
 function toggleWalletChoices() {
