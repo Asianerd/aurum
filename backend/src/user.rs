@@ -176,6 +176,7 @@ impl User {
         };
         let from_wallet = if from_user.wallet_exists(&from_wallet_id) { from_user.wallets.get(&from_wallet_id).unwrap() } else { return Ok(WalletResult::WalletNoExist) };
         let from_result = from_wallet.can_alter_balance(-amount);
+        println!("{:?}", from_result);
         if from_result != WalletResult::Success {
             return Ok(from_result);
         }
@@ -186,6 +187,7 @@ impl User {
         };
         let to_wallet = if to_user.wallet_exists(&to_wallet_id) { to_user.wallets.get(&to_wallet_id).unwrap() } else { return Ok(WalletResult::WalletNoExist) };
         let to_result = to_wallet.can_alter_balance(amount);
+        println!("{:?}", to_result);
         if to_result != WalletResult::Success {
             return Ok(to_result);
         }

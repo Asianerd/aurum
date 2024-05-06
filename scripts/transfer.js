@@ -26,6 +26,7 @@ function login_info() {
 var selectedUser = null;
 var selectedUserData = ['username', 'code']; // for transfer results
 var selectedWallet = 0;
+var surpassedLimit = false;
 
 var users = [];
 var wallets = [];
@@ -56,6 +57,9 @@ function validateTransfer() {
     if ((amount == '') || (amount == 0)) {
         flag = false;
     }
+    if (surpassedLimit) {
+        flag = false;
+    }
 
     document.querySelector("#confirmation").ariaLabel = flag ? "enabled" : "disabled";
 
@@ -73,13 +77,10 @@ function submitTransfer() {
 
     // /<from_wallet>/<to_user>/<to_wallet>/<amount>
     var params = `${selectedWallet}/${selectedUser}/0/${amount}`;
-    console.log(params);
     sendPostRequest(`${BACKEND_ADDRESS}/wallet/transfer_balance/${params}`, login_info(), (r) => {
         let response = JSON.parse(parseResponse(r));
 
         let state = response['Ok'];
-
-        console.log(state);
 
         if (state == "Success") {
             displayTransferResult("Success!", `${currencyFormatter.format(amount)} successfully transferred to ${selectedUserData[0]} (#${selectedUserData[1].slice(0, 4)}-${selectedUserData[1].slice(4, 8)})`);
@@ -140,7 +141,13 @@ function selectWallet(id) {
     sendPostRequest(`${BACKEND_ADDRESS}/wallet/get_limit/${selectedWallet}`, login_info(), (r) => {
         let response = JSON.parse(parseResponse(r));
 
-        console.log(response);
+        let available = response[1] - response[0];
+        surpassedLimit = (response[2] != 'unlimited') && (available <= 0);
+
+        validateTransfer();
+
+        document.querySelector("#limit-disclaimer").innerHTML = surpassedLimit ? `${currencyFormatter.format(response[1])} ${response[2]} limit reached!` : (response[2] != "unlimited" ? `${currencyFormatter.format(available)} until ${response[2]} limit` : "");
+        document.querySelector("#limit-disclaimer").ariaLabel = surpassedLimit ? 'surpassed' : '';
     })
 }
 

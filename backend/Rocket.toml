@@ -1,0 +1,8 @@
+[global]
+address = "www.ozmium.xyz"
+
+[development]
+address = "www.ozmium.xyz"
+
+[production]
+address = "www.ozmium.xyz"

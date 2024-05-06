@@ -42,7 +42,7 @@ impl Wallet {
         if n < 0f64 {
             return WalletResult::InsufficientAmount;
         }
-        if (self.get_limit() != 0f64) && (self.expenditure + amount) > self.get_limit() {
+        if (self.get_limit() != 0f64) && ((self.expenditure + amount.abs()) > self.get_limit()) {
             return WalletResult::ReachedLimit;
         }
         WalletResult::Success
@@ -73,10 +73,20 @@ impl Wallet {
         }
     }
 
+    pub fn get_limit_name(&self) -> String {
+        // qol, idk how to use strum for this
+        match &self.limit {
+            WalletLimit::Daily(_) => "daily",
+            WalletLimit::Weekly(_) => "weekly",
+            WalletLimit::Monthly(_) => "monthly",
+            _ => "unlimited"
+        }.to_string()
+    }
+
     //                              progress, limit
-    pub fn get_limit_progress(&self) -> (f64, f64) {
+    pub fn get_limit_progress(&self) -> (f64, f64, String) {
         let limit = self.get_limit();
-        (self.expenditure, limit)
+        (self.expenditure, limit, self.get_limit_name())
     }
 
     pub fn surpassed_limit(&self) -> bool {
@@ -223,7 +233,7 @@ pub fn get_limit(db: &State<Mutex<AccountHandler>>, login: LoginInformation, wal
         LoginResult::Success(user_id) => {
             utils::parse_response_to_string(Ok(match db.users.get(&user_id).unwrap().wallets.get(&wallet_id) {
                 Some(w) => w.get_limit_progress(),
-                None => (0f64, 0f64)
+                None => (0f64, 0f64, "Unlimited".to_string())
             }))
         },
         _ => utils::parse_response_to_string(Err(result))
