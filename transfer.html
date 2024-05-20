@@ -35,7 +35,7 @@
                     </h5>
                 </a>
                 <h3>transfer</h3>
-                <img src="/assets/qr_code.png">
+                <img id="qr" src="/assets/qr_code.png" onclick="toggleQRSection()">
             </div>
             <div id="user-data">
                 <div id="user-section">
@@ -61,8 +61,30 @@
                 <h4>$</h4>
                 <input onkeyup="validateTransfer();" type="number">
             </div>
+            <div id="qr-container" aria-label="disabled">
+                <div id="video-container">
+                    <video id="qr-video"></video>
+                </div>
+                <div id="actions">
+                    <h4 id="close" onclick="toggleQRSection()">
+                        close
+                    </h4>
+
+                    <label id="gallery"><img src="/assets/gallery.png"><input type="file" id="file-selector"></label>
+
+                    <img src="/assets/flashlight.png" id="flash-toggle" aria-label="off">
+                    <!-- <div>
+                        <button id="flash-toggle">📸 Flash: <span id="flash-state">off</span></button>
+                    </div> -->
+        
+                    
+                    <!-- <b>Detected QR code: </b>
+                    <span id="file-qr-result">None</span> -->
+                </div>
+            </div>
             <div id="destination" aria-label="open">
                 <div id="query-input">
+                    <!-- <img src="/assets/qr_code.png"> -->
                     <input onchange="queryUser()" type="text" placeholder="username/ID">
                     <img onclick="queryUser()" src="/assets/search.png">
                 </div>
@@ -88,6 +110,9 @@
         </div>
         <script src="/source.js"></script>
         <script src="/user.js"></script>
+        <script src="./scripts/qr_code/qr-scanner-worker.min.js" type="module"></script>
+        <script src="./scripts/qr_code/qr-scanner.min.js" type="module"></script>
+        <script src="./scripts/qr_segment.js" type="module"></script>
         <script src="./scripts/transfer.js"></script>
     </body>
 </html>

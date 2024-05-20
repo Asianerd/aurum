@@ -57,6 +57,22 @@ pub fn generate_users(db: &State<Mutex<AccountHandler>>, number: usize) -> Strin
 }
 
 #[get("/")]
+pub fn update_limits(db: &State<Mutex<AccountHandler>>) -> String {
+    // reset expenditure at end of limit period
+    // daily -> 12am utc
+    // weekly -> monday utc
+    // monthly -> 1st of month utc
+
+    // ran once a day
+
+    let mut db = db.lock().unwrap();
+
+    // logic here
+
+    "success".to_string()
+}
+
+#[get("/")]
 pub fn debug(db: &State<Mutex<AccountHandler>>) -> String {
     let db = db.lock().unwrap();
     serde_json::to_string_pretty(&db.users).unwrap()

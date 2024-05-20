@@ -230,7 +230,6 @@ pub fn top_up(db: &State<Mutex<AccountHandler>>, login: LoginInformation, wallet
     }
 }
 
-
 #[post("/<from_wallet>/<to_user>/<to_wallet>/<amount>", data="<login>")]
 pub fn transfer_balance(db: &State<Mutex<AccountHandler>>, login: LoginInformation, from_wallet: u128, to_user: u128, to_wallet: u128, amount: f64) -> String {
     let mut db = db.lock().unwrap();

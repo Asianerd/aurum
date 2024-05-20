@@ -180,3 +180,26 @@ function queryUser() {
 function toggleTransferResult(state) {
     document.querySelector("#transfer-result").ariaLabel = state ? "open" : "closed";
 }
+
+function toggleQRSection() {
+    let e = document.querySelector("#qr-container");
+
+    e.ariaLabel = e.ariaLabel == 'enabled' ? 'disabled' : 'enabled';
+
+    if (e.ariaLabel == 'enabled') {
+        // window.scanner.start();
+        startQR();
+    } else {
+        // window.scanner.stop();
+        stopQR();
+    }
+}
+
+function stopQR() {
+    window.scanner.stop();
+}
+
+function startQR() {
+    window.scanner.start();
+    window.updateFlashAvailability();
+}
