@@ -9,6 +9,7 @@ const fileSelector = document.getElementById('file-selector');
 
 function setResult(result) {
     console.log(result.data);
+    validateQRCode(result.data);
 }
 
 // ####### Web Cam Scanning #######
@@ -20,6 +21,9 @@ const scanner = new QrScanner(video, result => setResult(result), {
     highlightScanRegion: true,
     highlightCodeOutline: true,
 });
+
+// videoContainer.className = e.target.value;
+// scanner._updateOverlay(); // reposition the highlight because style 2 sets position: relative
 
 const updateFlashAvailability = () => {
     scanner.hasFlash().then(hasFlash => {

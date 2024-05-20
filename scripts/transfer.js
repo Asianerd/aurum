@@ -1,6 +1,16 @@
 document.querySelector("#user-data #username").innerHTML = username;
 sendPostRequest(`${BACKEND_ADDRESS}/get_code`, login_info(), (r) => {
     let response = JSON.parse(parseResponse(r));
+
+    document.querySelector("#overlay #self-qr > div").appendChild(QRCode({
+        msg:response,
+        dim:512,
+        pal:["#7f7cff", "#000"],
+        // pal:["#000", "#fff"],
+        ecl:"H",
+        vrb:1
+    }));
+
     document.querySelector("#user-data #code").innerHTML = `#${response.slice(0, 4)}-${response.slice(4, 8)}`;
 })
 
@@ -187,12 +197,16 @@ function toggleQRSection() {
     e.ariaLabel = e.ariaLabel == 'enabled' ? 'disabled' : 'enabled';
 
     if (e.ariaLabel == 'enabled') {
-        // window.scanner.start();
         startQR();
     } else {
-        // window.scanner.stop();
         stopQR();
     }
+}
+
+function toggleSelfQR() {
+    let e = document.querySelector("#overlay #self-qr");
+
+    e.ariaLabel = e.ariaLabel == 'open' ? 'closed' : 'open';
 }
 
 function stopQR() {
@@ -202,4 +216,14 @@ function stopQR() {
 function startQR() {
     window.scanner.start();
     window.updateFlashAvailability();
+}
+
+function validateQRCode(code) {
+    if (code.length != 8) {
+        return;
+    }
+
+    toggleQRSection();
+    document.querySelector("#destination #query-input input").value = code;
+    queryUser();
 }
