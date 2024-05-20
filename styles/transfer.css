@@ -532,6 +532,8 @@
     & #self-qr {
         background:#0005;
 
+        position:absolute;
+
         overflow:hidden;
 
         display:flex;
@@ -573,6 +575,10 @@
 
                 border-radius:var(--border-radius);
             }
+        }
+
+        &[aria-label='closed'] {
+            display:none;
         }
     }
 }

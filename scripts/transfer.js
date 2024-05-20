@@ -11,6 +11,8 @@ sendPostRequest(`${BACKEND_ADDRESS}/get_code`, login_info(), (r) => {
         vrb:1
     }));
 
+    document.querySelector("#overlay #self-qr #title").innerHTML = `${username}'s qr code`;
+
     document.querySelector("#user-data #code").innerHTML = `#${response.slice(0, 4)}-${response.slice(4, 8)}`;
 })
 
