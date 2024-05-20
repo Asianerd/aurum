@@ -201,8 +201,23 @@ pub fn get_balance(db: &State<Mutex<AccountHandler>>, login: LoginInformation, w
     }
 }
 
+// dk why i thought to make this an api call
+// #[post("/<wallet_id>/<amount>", data="<login>")]
+// pub fn alter_balance(db: &State<Mutex<AccountHandler>>, login: LoginInformation, wallet_id: u128, amount: f64) -> String {
+//     let mut db = db.lock().unwrap();
+//     let result = login.login(&db);
+//     match result {
+//         LoginResult::Success(user_id) => {
+//             let r = utils::parse_response_to_string(Ok(db.users.get_mut(&user_id).unwrap().alter_balance(&wallet_id, &amount)));
+//             db.save();
+//             r
+//         },
+//         _ => utils::parse_response_to_string(Err(&result))
+//     }
+// }
+
 #[post("/<wallet_id>/<amount>", data="<login>")]
-pub fn alter_balance(db: &State<Mutex<AccountHandler>>, login: LoginInformation, wallet_id: u128, amount: f64) -> String {
+pub fn top_up(db: &State<Mutex<AccountHandler>>, login: LoginInformation, wallet_id: u128, amount: f64) -> String {
     let mut db = db.lock().unwrap();
     let result = login.login(&db);
     match result {
@@ -214,6 +229,7 @@ pub fn alter_balance(db: &State<Mutex<AccountHandler>>, login: LoginInformation,
         _ => utils::parse_response_to_string(Err(&result))
     }
 }
+
 
 #[post("/<from_wallet>/<to_user>/<to_wallet>/<amount>", data="<login>")]
 pub fn transfer_balance(db: &State<Mutex<AccountHandler>>, login: LoginInformation, from_wallet: u128, to_user: u128, to_wallet: u128, amount: f64) -> String {

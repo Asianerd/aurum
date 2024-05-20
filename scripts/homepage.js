@@ -1,10 +1,3 @@
-var username = fetchLocalStorage("aurum_username");
-var password = fetchLocalStorage("aurum_password");
-
-if ((username === null) || (password === null)) {
-    window.location.href = "./login.html";
-}
-
 var walletContainer = document.querySelector("#wallets");
 
 var currencyFormatter = new Intl.NumberFormat('en-UK', {
@@ -19,13 +12,6 @@ var colour_themes = [
     "dodgerblue",
     "blueviolet"
 ];
-
-function login_info() {
-    return JSON.stringify({
-        "username":username,
-        "password":password
-    });
-}
 
 document.querySelector("#parent #username").innerHTML = username;
 

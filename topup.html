@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>aurum</title>
+        <link rel="shortcut icon" href="icon.ico">
+        <meta charset="utf-8">
+        <meta name="author" content="han_yuji_">
+        <link rel="stylesheet" href="/styles/style.css">
+        <link rel="stylesheet" href="./styles/topup.css">
+    </head>
+    <body>
+        <div id="overlay">
+            <div id="topup-result" aria-label="closed">
+                <h3 id="header">
+                    huh
+                </h3>
+                <h4 id="description">
+                    youre not supposed to see this
+                </h4>
+                <h4 onclick="toggleTopUpResult(false)">
+                    close
+                </h4>
+            </div>
+        </div>
+        <div id="parent">
+            <div id="header">
+                <a href="./index.html" id="return">
+                    <img src="/assets/left_chevron.png">
+                    <h5>
+                        return
+                    </h5>
+                </a>
+                <h3>top-up</h3>
+            </div>
+            <div id="amount">
+                <div id="currency">
+                    <h4>MYR</h4>
+                    <input type="text" onkeyup="validateInputs()" maxlength="9">
+                </div>
+                <div id="quick-select">
+                    <h4 onclick="setAmount(10)">10</h4>
+                    <h4 onclick="setAmount(50)">50</h4>
+                    <h4 onclick="setAmount(100)">100</h4>
+                    <h4 onclick="setAmount(200)">200</h4>
+                </div>
+            </div>
+            <div id="wallet-section">
+                <div id="wallet-select" aria-label="closed">
+                    <h4 onclick="toggleWalletChoices()">savings</h4>
+                    <div id="choices">
+                        <h4>wallet</h4>
+                        <h4>savings</h4>
+                    </div>
+                </div>
+                <h4>
+                    with $4000.00
+                </h4>
+            </div>
+            <div id="card">
+                <div id="credit-card">
+                    <img src="/assets/credit_card.png">
+                    <hr>
+                    <input id="cc-number" type="text" maxlength="" onkeyup="validateInputs()" onkeyup="CCUpdate()" pattern="[0-9]+">
+                </div>
+                <div id="data">
+                    <div id="expiry">
+                        <input id="cc-exp-year" type="text" placeholder="mm" maxlength="2" onkeyup="validateInputs()" pattern="[0-9]+">
+                        <h4>/</h4>
+                        <input id="cc-exp-month" type="text" placeholder="yy" maxlength="2" onkeyup="validateInputs()" pattern="[0-9]+">
+                    </div>
+                    <input id="cc-cvc" type="text" placeholder="cvc" maxlength="3" onkeyup="validateInputs()" pattern="[0-9]+">
+                </div>
+            </div>
+            <div id="confirmation">
+                <h4 onclick="submitTopup()">
+                    top-up
+                </h4>
+            </div>
+        </div>
+        <script src="/source.js"></script>
+        <script src="/user.js"></script>
+        <script src="./scripts/topup.js"></script>
+    </body>
+</html>

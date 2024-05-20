@@ -1,10 +1,3 @@
-var username = fetchLocalStorage("aurum_username");
-var password = fetchLocalStorage("aurum_password");
-
-if ((username === null) || (password === null)) {
-    window.location.href = "./login.html";
-}
-
 document.querySelector("#user-data #username").innerHTML = username;
 sendPostRequest(`${BACKEND_ADDRESS}/get_code`, login_info(), (r) => {
     let response = JSON.parse(parseResponse(r));
@@ -15,13 +8,6 @@ var currencyFormatter = new Intl.NumberFormat('en-UK', {
     style: 'currency',
     currency: 'MYR'
 })
-
-function login_info() {
-    return JSON.stringify({
-        "username":username,
-        "password":password
-    });
-}
 
 var selectedUser = null;
 var selectedUserData = ['username', 'code']; // for transfer results

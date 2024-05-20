@@ -37,7 +37,7 @@ fn rocket() -> _ {
         .mount("/wallet/get_wallets", routes![wallet::get_wallets])
         .mount("/wallet/get_balance", routes![wallet::get_balance])
         .mount("/wallet/get_total_balance", routes![wallet::get_total_balance])
-        .mount("/wallet/alter_balance", routes![wallet::alter_balance])
+        .mount("/wallet/top_up", routes![wallet::top_up])
         .mount("/wallet/create_wallet", routes![wallet::create_wallet])
         .mount("/wallet/transfer_balance", routes![wallet::transfer_balance])
         .mount("/wallet/get_limit", routes![wallet::get_limit])
