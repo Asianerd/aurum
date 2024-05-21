@@ -1,8 +1,0 @@
-[global]
-address = "3.106.177.190"
-
-[development]
-address = "3.106.177.190"
-
-[production]
-address = "3.106.177.190"
