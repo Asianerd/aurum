@@ -299,7 +299,8 @@ impl<'l> FromData<'l> for LoginInformation {
         let result = data.peek(512).await.to_vec();
 
         if result.is_empty() {
-            return Outcome::Failure((
+            // return OutCome::Error
+            return Outcome::Error((
                 Status::Ok,
                 LoginInfoParseError::Empty
             ))
