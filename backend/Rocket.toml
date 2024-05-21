@@ -3,3 +3,7 @@ address = "127.0.0.1"
 
 [release]
 address = "0.0.0.0"
+
+[release.tls]
+certs = "/etc/letsencrypt/live/ozmium.xyz/fullchain.pem"
+key = "/etc/letsencrypt/live/ozmium.xyz/privkey.pem"
