@@ -22,6 +22,8 @@ const scanner = new QrScanner(video, result => setResult(result), {
     highlightCodeOutline: true,
 });
 
+scanner.setInversionMode("both");
+
 // videoContainer.className = e.target.value;
 // scanner._updateOverlay(); // reposition the highlight because style 2 sets position: relative
 
