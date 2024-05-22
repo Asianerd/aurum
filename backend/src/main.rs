@@ -17,19 +17,19 @@ pub fn index() -> String {
 
 #[launch]
 fn rocket() -> _ {
-    let cert_path = "/etc/letsencrypt/live/ozmium.xyz/fullchain.pem";
-    let key_path = "/etc/letsencrypt/live/ozmium.xyz/privkey.pem";
+    // let cert_path = "/etc/letsencrypt/live/ozmium.xyz/fullchain.pem";
+    // let key_path = "/etc/letsencrypt/live/ozmium.xyz/privkey.pem";
 
-    // Check if files exist
-    if !Path::new(cert_path).exists() {
-        eprintln!("Certificate file not found: {}", cert_path);
-        std::process::exit(1);
-    }
+    // // Check if files exist
+    // if !Path::new(cert_path).exists() {
+    //     eprintln!("Certificate file not found: {}", cert_path);
+    //     std::process::exit(1);
+    // }
 
-    if !Path::new(key_path).exists() {
-        eprintln!("Key file not found: {}", key_path);
-        std::process::exit(1);
-    }
+    // if !Path::new(key_path).exists() {
+    //     eprintln!("Key file not found: {}", key_path);
+    //     std::process::exit(1);
+    // }
 
     rocket::custom(rocket::config::Config::figment().merge(("port", 8000)))
         .manage(Mutex::new(account_handler::AccountHandler::load()))
