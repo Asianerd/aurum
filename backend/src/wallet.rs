@@ -223,6 +223,7 @@ pub fn top_up(db: &State<Mutex<AccountHandler>>, login: LoginInformation, wallet
     match result {
         LoginResult::Success(user_id) => {
             let r = utils::parse_response_to_string(Ok(db.users.get_mut(&user_id).unwrap().alter_balance(&wallet_id, &amount)));
+            
             db.save();
             r
         },

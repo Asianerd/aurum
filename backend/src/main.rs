@@ -5,6 +5,7 @@ use std::{path::Path, sync::Mutex};
 mod utils;
 mod cors;
 
+mod log;
 mod wallet;
 mod account_handler;
 mod user;
