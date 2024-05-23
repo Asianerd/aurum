@@ -51,15 +51,15 @@ async function signup() {
             setLocalStorage("aurum_password", password);
 
             window.location.href = "./index.html";
+        } else {
+            result.innerHTML = {
+                "UsernameNoExist": "username doesnt exist",
+                "PasswordWrong": "password is incorrect",
+                "UserIDNoExist": "username doesnt exist",
+                "Success": "",
+
+                "UsernameTaken": "username is already taken"
+            }[response];
         }
-
-        result.innerHTML = {
-            "UsernameNoExist": "username doesnt exist",
-            "PasswordWrong": "password is incorrect",
-            "UserIDNoExist": "username doesnt exist",
-            "Success": "",
-
-            "UsernameTaken": "username is already taken"
-        }[response];
     })
 }
