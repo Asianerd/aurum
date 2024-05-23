@@ -105,5 +105,14 @@
     
         border-width:0;
     }
+
+    & #ps-disclaimer {
+        margin-top:0.1em;
+
+        font-size:1em;
+        font-style:italic;
+        opacity: 0.5;
+        text-align: center;
+    }
 }
 
