@@ -13,7 +13,7 @@ sendPostRequest(`${BACKEND_ADDRESS}/get_code`, login_info(), (r) => {
 
     document.querySelector("#overlay #self-qr #title").innerHTML = `${username}'s qr code`;
 
-    document.querySelector("#user-data #code").innerHTML = `#${response.slice(0, 4)}-${response.slice(4, 8)}`;
+    document.querySelector("#user-data #code").innerHTML = formatUserCode(response);
 })
 
 var currencyFormatter = new Intl.NumberFormat('en-UK', {
@@ -178,7 +178,7 @@ function queryUser() {
     <img src="/assets/profile.png">
     <div id="credentials">
         <h4>${e[2]}</h4>
-        <h5 id="code">#${e[1].slice(0, 4)}-${e[1].slice(4, 8)}</h5>
+        <h5 id="code">${formatUserCode(e[1])}</h5>
     </div>
 </div>`;
 //             container.innerHTML += `<div class="user" onclick="selectUser(this, ${e[0]})">

@@ -1,3 +1,5 @@
+var userCode;
+
 var walletContainer = document.querySelector("#wallets");
 
 var currencyFormatter = new Intl.NumberFormat('en-UK', {
@@ -146,3 +148,88 @@ function createWallet() {
 }
 // #endregion
 
+// #region logs
+sendPostRequest(`${BACKEND_ADDRESS}/get_code`, login_info(), (r) => {
+    let response = parseResponse(r);
+
+    userCode = JSON.parse(response);
+
+    updateLog();
+})
+
+
+function updateLog() {
+    sendPostRequest(`${BACKEND_ADDRESS}/log/fetch_logs/${0}`, login_info(), (r) => {
+        let response = JSON.parse(parseResponse(r));
+
+        let container = document.querySelector("#history > table > tbody");
+        container.innerHTML = '';
+        response.forEach((e) => {
+            // 4 diff types of transfers
+            // topup, transfer to, transfer from, and transfer between wallets
+            // let t = e.species;
+            // let t;
+            // if (e.species == "TopUp") {
+            //     t = "TopUp";
+            // } else {
+            //     if (e.species.to == e.species.from) {
+            //         t = "TransferBetween";
+            //     } else {
+            //         if (e.species.to_code == userCode) {
+            //             t = "TransferFrom";
+            //         } else {
+            //             t = "TransferTo";
+            //         }
+            //     }
+            // }
+
+            let t = (e.species == "TopUp") ? "TopUp" : ((e.to == e.from) ? "TransferBetween" : (e.to_code == userCode ? "TransferFrom" : "TransferTo"));
+
+            container.innerHTML += `
+            <tr class="entry">
+                <td><img id="icon" src="/assets/${{
+                    "TopUp":"add",
+                    "TransferTo":"outgoing",
+                    "TransferFrom":"incoming",
+                    "TransferBetween":"transfer"
+                }[t]}.png"></td>
+                <td>
+                    <div>
+                        <h4 id="target">${{
+                            "TopUp": "Top Up",
+                            "TransferTo": e.to_name,
+                            "TransferFrom": e.from_name,
+                            "TransferBetween": e.to_wallet_name
+                        }[t]}</h4>
+                        <h5 id="subscript">${formatDateTime(new Date(e.time * 1000))}</h5>
+                    </div>
+                </td>
+                <td>
+                    <div id="wallet-info">
+                        <h4 id="amount">${{
+                            "TopUp": "+",
+                            "TransferTo": "-",
+                            "TransferFrom": "+",
+                            "TransferBetween": "+"
+                        }[t]} ${currencyFormatter.format(Math.abs(e.amount))}</h4>
+                        <span id="target">
+                            <img src="/assets/curved_arrow.png">
+                            <h5 id="subscript">${{
+                                "TopUp": "to",
+                                "TransferTo": "from",
+                                "TransferFrom": "to",
+                                "TransferBetween": "from"
+                            }[t]} ${{
+                                "TopUp": e.to_wallet_name,
+                                "TransferTo": e.from_wallet_name,
+                                "TransferFrom": e.to_wallet_name,
+                                "TransferBetween": e.from_wallet_name
+                            }[t]}</h5>
+                        </span>
+                    </div>
+                </td>
+            </tr>`;
+        })
+    });
+}
+// #endregion

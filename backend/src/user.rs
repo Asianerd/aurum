@@ -12,7 +12,7 @@ use rocket::State;
 use serde::{Deserialize, Serialize};
 
 use crate::account_handler::AccountHandler;
-use crate::utils;
+use crate::{log, utils};
 use crate::wallet::{Wallet, WalletLimit, WalletResult};
 
 const USER_ID_MAX: u128 = 4294967296u128; // 16^8, 2^32
@@ -176,7 +176,7 @@ impl User {
         };
         let from_wallet = if from_user.wallet_exists(&from_wallet_id) { from_user.wallets.get(&from_wallet_id).unwrap() } else { return Ok(WalletResult::WalletNoExist) };
         let from_result = from_wallet.can_alter_balance(-amount);
-        println!("{:?}", from_result);
+        // println!("{:?}", from_result);
         if from_result != WalletResult::Success {
             return Ok(from_result);
         }
@@ -187,7 +187,7 @@ impl User {
         };
         let to_wallet = if to_user.wallet_exists(&to_wallet_id) { to_user.wallets.get(&to_wallet_id).unwrap() } else { return Ok(WalletResult::WalletNoExist) };
         let to_result = to_wallet.can_alter_balance(amount);
-        println!("{:?}", to_result);
+        // println!("{:?}", to_result);
         if to_result != WalletResult::Success {
             return Ok(to_result);
         }
@@ -196,6 +196,8 @@ impl User {
 
         db.users.get_mut(&from).unwrap().alter_balance(&from_wallet_id, &((-amount).clone()));
         db.users.get_mut(&to).unwrap().alter_balance(&to_wallet_id, &amount);
+        db.log.log(utils::get_time(), log::Species::Transfer, to, to_wallet_id, from, from_wallet_id, amount);
+        db.save();
 
         Ok(WalletResult::Success)
     }
@@ -351,6 +353,8 @@ pub fn signup(db: &State<Mutex<AccountHandler>>, login: LoginInformation) -> Str
     serde_json::to_string(&login.signup(&mut db)).unwrap()
 }
 
+// apply caching
+// remove username from cache when username is changed
 #[get("/<username>")]
 pub fn get_user_id(db: &State<Mutex<AccountHandler>>, username: String) -> String {
     let db = db.lock().unwrap();

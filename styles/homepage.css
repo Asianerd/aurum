@@ -201,6 +201,8 @@
 
             display:none;
 
+            z-index: 1000;
+
             & h5 {
                 font-style:italic;
 
@@ -230,7 +232,7 @@
     }
 
     & .entry {
-
+        border-style:none;
         border-bottom-style:solid;
         border-color:#fff5;
         border-width:1px;
@@ -239,18 +241,95 @@
             padding:0.5em 1ch;
         }
 
-        & img#icon {
-            height:2.5em;
+        & img {
+            height:2em;
         }
 
-        & #description {
+        & #target {
+            min-width: 20ch;
+        }
+
+        & #subscript {
             font-style:italic;
             color:#fff8;
         }
 
-        &:last-of-type {
+        & #wallet-info {
+            display:flex;
+            justify-content: start;
+            align-items: start;
+
+            flex-direction: column;
+
+            & #target {
+                display:flex;
+                justify-content: start;
+                align-items: center;
+
+                & img {
+                    height:2em;
+                    padding-right:1ch;
+                    margin-left:0.5ch;
+
+                    opacity: 0.5;
+                }
+            }
+        }
+
+        &:last-child {
             border-bottom-style:none;
         }
+
+        /* &.transfer {
+            & #holder {
+                display:flex;
+                justify-content: start;
+                align-items:start;
+
+                flex-direction: column;
+            }
+
+            & #wallet-info {
+                display:flex;
+                justify-content: start;
+                align-items:center;
+
+                flex-direction: row;
+
+                & #segmented-arrow {
+                    display:flex;
+                    justify-content: start;
+                    align-items: center;
+
+                    flex-direction: row;
+
+                    margin:0 2ch;
+
+                    & img {
+                        height:1em;
+                    }
+
+                    & #body {
+                        & img {
+                            width:100%;
+
+                            margin:0;
+                            padding:0;
+                        }
+
+                        & h5#amount {
+                            bottom:0;
+                            height:0;
+
+                            width:max-content;
+
+                            margin:0;
+                            padding:0;
+                        }
+                    }
+                }
+            }
+        } */
     }
 }
 

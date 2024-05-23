@@ -40,6 +40,9 @@ fn rocket() -> _ {
         .mount("/generate_users", routes![account_handler::generate_users])
         .mount("/debug", routes![account_handler::debug])
 
+        .mount("/debug_log", routes![log::debug_logs])
+        .mount("/log/fetch_logs", routes![log::get_logs])
+
         .mount("/login", routes![user::login])
         .mount("/signup", routes![user::signup])
         .mount("/lookup_username", routes![user::get_user_id])

@@ -1,3 +1,5 @@
+use std::time::{SystemTime, UNIX_EPOCH};
+
 use rand::prelude::*;
 
 const ADJECTIVES: &str = "abandoned
@@ -8131,6 +8133,13 @@ zootsuit
 zucchini";
 
 // ad + noun
+
+pub fn get_time() -> u128 {
+    SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .expect("Time went backwards")
+        .as_secs() as u128
+}
 
 pub fn generate_name(rng: &mut ThreadRng) -> String {
     format!(

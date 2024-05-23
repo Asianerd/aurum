@@ -4,7 +4,7 @@ use rocket::State;
 use serde::{Deserialize, Serialize};
 use strum_macros::EnumString;
 
-use crate::{account_handler::AccountHandler, user::{self, LoginInformation, LoginResult}, utils};
+use crate::{account_handler::AccountHandler, log, user::{self, LoginInformation, LoginResult}, utils};
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Wallet {
@@ -223,7 +223,7 @@ pub fn top_up(db: &State<Mutex<AccountHandler>>, login: LoginInformation, wallet
     match result {
         LoginResult::Success(user_id) => {
             let r = utils::parse_response_to_string(Ok(db.users.get_mut(&user_id).unwrap().alter_balance(&wallet_id, &amount)));
-            
+            db.log.log(utils::get_time(), log::Species::TopUp, user_id, wallet_id, 0, 0, amount);
             db.save();
             r
         },
