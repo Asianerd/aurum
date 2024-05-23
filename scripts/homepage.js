@@ -41,14 +41,16 @@ function toggleWalletCreate(b=null) {
 
 // #region colours
 // lazy to scope nicely
-let _c = document.querySelector("#overlay #wallet-creation #colours");
-_c.innerHTML = '';
-colour_themes.forEach((e, i) => {
-    _c.innerHTML += `<hr onclick="walletColourSelect(${i})" style="background:${e}">`;
+let _c = document.querySelectorAll("#colour-selection #colours");
+_c.forEach((c) => {
+    c.innerHTML = '';
+    colour_themes.forEach((e, i) => {
+        c.innerHTML += `<hr onclick="walletColourSelect(${i})" style="background:${e}">`;
+    })
 })
 
-function toggleWalletColourThemes() {
-    document.querySelector("#wallet-creation #colour-selection #colours").ariaLabel = document.querySelector("#wallet-creation #colour-selection #colours").ariaLabel == "open" ? "closed" : "open";
+function toggleWalletColourThemes(e) {
+    e.parentNode.querySelector("#colours").ariaLabel = e.parentNode.querySelector("#colours").ariaLabel == "open" ? "closed" : "open";
 }
 
 function toggleWalletDurationSelection() {
@@ -82,7 +84,7 @@ function populateWallets() {
 
         response.forEach((e) => {
             walletContainer.innerHTML += `
-<div class="wallet" ${e['id'] == 0 ? `id="main"` : ''} style="background:${colour_themes[e['colour']]}">
+<div class="wallet" ${e['id'] == 0 ? `id="main"` : ''} style="background:${colour_themes[e['colour']]}" onclick="toggleWalletInfo(${e['id']})">
     <h4>${e['name']}</h4>
     <h3>${currencyFormatter.format(e['balance'])}</h3>
 </div>`;
@@ -231,5 +233,21 @@ function updateLog() {
             </tr>`;
         })
     });
+}
+// #endregion
+
+// #region wallet updating
+function toggleWalletInfo(w=null) {
+    if (w === null) {
+        document.querySelector("#overlay #wallet-info").ariaLabel = "closed";
+    } else {
+        console.log(w);
+        document.querySelector("#overlay #wallet-info").ariaLabel = "open";
+    }
+}
+
+function toggleWalletUpdateDurationSelection() {
+    let d = document.querySelector("#overlay #wallet-info #duration-selection");
+    d.ariaLabel = d.ariaLabel == 'open' ? 'closed' : 'open';
 }
 // #endregion

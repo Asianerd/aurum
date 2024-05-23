@@ -28,12 +28,60 @@
                 </div>
                 <div>
                     <div id="colour-selection">
-                        <img src="/assets/colour_wheel.png" onclick="toggleWalletColourThemes()">
+                        <img src="/assets/colour_wheel.png" onclick="toggleWalletColourThemes(this)">
                         <div id="colours" aria-label="closed"></div>
                     </div>
                     <h3 id="create-button" aria-label="enabled" onclick="createWallet()" >create</h3>
                 </div>
                 <img src="/assets/cross.png" id="exit-button" onclick="toggleWalletCreate(false)">
+            </div>
+            <div id="wallet-info" aria-label="closed">
+                <table>
+                    <tbody>
+                        <tr>
+                            <div id="wallet">
+                                <h4>lorem ipsum</h4>
+                                <h4>MYR 20,000.00</h4>
+                                <div id="limit-section">
+                                    <div id="header">
+                                        <div id="duration-selection" aria-label="closed">
+                                            <h5 onclick="toggleWalletUpdateDurationSelection()">
+                                                daily
+                                            </h5>
+                                            <div id="choices">
+                                                <h5 onclick="updateWalletDuration('unlimited')">unlimited</h5>
+                                                <h5 onclick="updateWalletDuration('daily')">daily</h5>
+                                                <h5 onclick="updateWalletDuration('weekly')">weekly</h5>
+                                                <h5 onclick="updateWalletDuration('monthly')">monthly</h5>
+                                            </div>
+                                        </div>
+                                        <span id="limit">
+                                            <h4>
+                                                limit of MYR
+                                            </h4>
+                                            <input type="text" onkeydown="this.style.width = this.value.length + 2 + 'ch';">
+                                        </span>
+                                    </div>
+                                    <h4 id="remaining">MYR 600.00 remaining</h4>
+                                </div>
+                            </div>
+                        </tr>
+                        <tr>
+                            <div id="actions">
+                                <div>
+                                    <img src="/assets/trash.png">
+                                    <div id="colour-selection">
+                                        <img src="/assets/colour_wheel.png" onclick="toggleWalletColourThemes(this)">
+                                        <div id="colours" aria-label="closed"></div>
+                                    </div>
+                                </div>
+                                <h4 onclick="toggleWalletInfo()">
+                                    save
+                                </h4>
+                            </div>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
         <div id="parent">
@@ -46,7 +94,7 @@
                     total balance
                 </h4>
                 <h3>
-                    RM120,000.00
+
                 </h3>
             </div>
             <div id="actions">
@@ -74,30 +122,6 @@
                 wallets
             </h4>
             <div id="wallets">
-                <div class="wallet" id="main" style="background:dodgerblue">
-                    <h4>
-                        wallet
-                    </h4>
-                    <h3>
-                        RM 80,000.00
-                    </h3>
-                </div>
-                <div class="wallet" style="background:limegreen">
-                    <h4>
-                        groceries
-                    </h4>
-                    <h3>
-                        RM 80,000.00
-                    </h3>
-                </div>
-                <div class="wallet" style="background:crimson">
-                    <h4>
-                        japan trip 2024 🏯
-                    </h4>
-                    <h3>
-                        RM 80,000.00
-                    </h3>
-                </div>
                 <div class="wallet" id="add">
                     <img src="/assets/add.png">
                 </div>
