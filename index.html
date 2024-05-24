@@ -11,59 +11,78 @@
     <body>
         <div id="overlay">
             <div id="wallet-creation" aria-label="closed">
-                <input type="text" placeholder="wallet name" onkeyup="validateCreateWallet()">
-                <div id="limits">
-                    <div id="duration-selection" aria-label="closed">
-                        <h5 onclick="toggleWalletDurationSelection()">
-                            daily
-                        </h5>
-                        <div id="choices">
-                            <h5 onclick="selectWalletDuration('daily')">daily</h5>
-                            <h5 onclick="selectWalletDuration('weekly')">weekly</h5>
-                            <h5 onclick="selectWalletDuration('monthly')">monthly</h5>
-                        </div>
-                    </div>
-                    <h5>limit : $</h5>
-                    <input type="number" placeholder="none" onkeyup="validateCreateWallet()">
-                </div>
-                <div>
-                    <div id="colour-selection">
-                        <img src="/assets/colour_wheel.png" onclick="toggleWalletColourThemes(this)">
-                        <div id="colours" aria-label="closed"></div>
-                    </div>
-                    <h3 id="create-button" aria-label="enabled" onclick="createWallet()" >create</h3>
-                </div>
-                <img src="/assets/cross.png" id="exit-button" onclick="toggleWalletCreate(false)">
+                <table>
+                    <tbody>
+                        <tr>
+                            <div id="wallet">
+                                <input type="text" placeholder="wallet name" onkeyup="validateCreateWallet()">
+                                <div id="limits">
+                                    <div id="duration-selection" aria-label="closed">
+                                        <h5 onclick="toggleWalletDurationSelection(this)">
+                                            daily
+                                        </h5>
+                                        <div id="choices">
+                                            <h5 onclick="selectWalletDuration(this, 'daily')">daily</h5>
+                                            <h5 onclick="selectWalletDuration(this, 'weekly')">weekly</h5>
+                                            <h5 onclick="selectWalletDuration(this, 'monthly')">monthly</h5>
+                                        </div>
+                                    </div>
+                                    <h5>limit : $</h5>
+                                    <input type="number" placeholder="none" onkeyup="validateCreateWallet()">
+                                </div>
+                                <img src="/assets/cross.png" id="exit-button" onclick="toggleWalletCreate(false)">
+                            </div>
+                        </tr>
+                        <tr>
+                            <div id="actions">
+                                <div>
+                                    <div id="colour-selection">
+                                        <img src="/assets/colour_wheel.png" onclick="toggleWalletColourThemes(this)">
+                                        <div id="colours" aria-label="closed"></div>
+                                    </div>
+                                </div>
+                                <h3 id="create-button" aria-label="enabled" onclick="createWallet()" >create</h3>
+                            </div>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
             <div id="wallet-info" aria-label="closed">
                 <table>
                     <tbody>
                         <tr>
                             <div id="wallet">
-                                <h4>lorem ipsum</h4>
-                                <h4>MYR 20,000.00</h4>
+                                <!-- <h4 id="name">lorem ipsum</h4> -->
+                                <input id="name" type="text">
+                                <h4 id="amount">MYR 20,000.00</h4>
                                 <div id="limit-section">
                                     <div id="header">
                                         <div id="duration-selection" aria-label="closed">
-                                            <h5 onclick="toggleWalletUpdateDurationSelection()">
+                                            <h5 onclick="toggleWalletDurationSelection(this)">
                                                 daily
                                             </h5>
                                             <div id="choices">
-                                                <h5 onclick="updateWalletDuration('unlimited')">unlimited</h5>
-                                                <h5 onclick="updateWalletDuration('daily')">daily</h5>
-                                                <h5 onclick="updateWalletDuration('weekly')">weekly</h5>
-                                                <h5 onclick="updateWalletDuration('monthly')">monthly</h5>
+                                                <h5 onclick="selectWalletDuration(this, 'unlimited')">unlimited</h5>
+                                                <h5 onclick="selectWalletDuration(this, 'daily')">daily</h5>
+                                                <h5 onclick="selectWalletDuration(this, 'weekly')">weekly</h5>
+                                                <h5 onclick="selectWalletDuration(this, 'monthly')">monthly</h5>
                                             </div>
                                         </div>
                                         <span id="limit">
                                             <h4>
-                                                limit of MYR
+                                                limit
                                             </h4>
-                                            <input type="text" onkeydown="this.style.width = this.value.length + 2 + 'ch';">
+                                            <div id="info">
+                                                <h4>
+                                                    of MYR
+                                                </h4>
+                                                <input type="text" onkeydown="this.style.width = this.value.length + 2 + 'ch';">
+                                            </div>
                                         </span>
                                     </div>
                                     <h4 id="remaining">MYR 600.00 remaining</h4>
                                 </div>
+                                <img src="/assets/cross.png" id="exit-button" onclick="toggleWalletInfo()">
                             </div>
                         </tr>
                         <tr>

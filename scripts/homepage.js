@@ -1,6 +1,7 @@
 var userCode;
 
 var walletContainer = document.querySelector("#wallets");
+var walletData = {};
 
 var currencyFormatter = new Intl.NumberFormat('en-UK', {
     style: 'currency',
@@ -41,30 +42,29 @@ function toggleWalletCreate(b=null) {
 
 // #region colours
 // lazy to scope nicely
-let _c = document.querySelectorAll("#colour-selection #colours");
-_c.forEach((c) => {
-    c.innerHTML = '';
-    colour_themes.forEach((e, i) => {
-        c.innerHTML += `<hr onclick="walletColourSelect(${i})" style="background:${e}">`;
-    })
+let _c = document.querySelector("#wallet-creation #colour-selection #colours");
+_c.innerHTML = '';
+colour_themes.forEach((e, i) => {
+    _c.innerHTML += `<hr onclick="walletColourSelect(${i})" style="background:${e}">`;
 })
 
 function toggleWalletColourThemes(e) {
     e.parentNode.querySelector("#colours").ariaLabel = e.parentNode.querySelector("#colours").ariaLabel == "open" ? "closed" : "open";
 }
 
-function toggleWalletDurationSelection() {
-    document.querySelector("#wallet-creation #duration-selection").ariaLabel = document.querySelector("#wallet-creation #duration-selection").ariaLabel == "open" ? "closed" : "open";
+function toggleWalletDurationSelection(e) {
+    let d = e.parentNode;
+    d.ariaLabel = d.ariaLabel == "open" ? "closed" : "open";
 }
 
 function walletColourSelect(i) {
-    document.querySelector("#overlay #wallet-creation").style.background = colour_themes[i];
-    document.querySelector("#overlay #wallet-creation").dataset.colour = i;
+    document.querySelector("#overlay #wallet-creation #wallet").style.background = colour_themes[i];
+    document.querySelector("#overlay #wallet-creation #wallet").dataset.colour = i;
 }
 
-function selectWalletDuration(t) {
-    document.querySelector("#wallet-creation #duration-selection > h5").innerHTML = t;
-    toggleWalletDurationSelection();
+function selectWalletDuration(e, t) {
+    e.parentNode.parentNode.querySelector("& > h5").innerHTML = t;
+    toggleWalletDurationSelection(e.parentNode);
 }
 
 walletColourSelect(0);
@@ -82,7 +82,9 @@ function populateWallets() {
 
         walletContainer.innerHTML = '';
 
+        walletData = {};
         response.forEach((e) => {
+            walletData[e['id']] = {...e};
             walletContainer.innerHTML += `
 <div class="wallet" ${e['id'] == 0 ? `id="main"` : ''} style="background:${colour_themes[e['colour']]}" onclick="toggleWalletInfo(${e['id']})">
     <h4>${e['name']}</h4>
@@ -107,8 +109,8 @@ updateInformation();
 // #region wallet
 function validateCreateWallet() {
     let flag = true;
-    let name = document.querySelector("#wallet-creation > input[type=text]").value;
-    let colour = document.querySelector("#wallet-creation").dataset.colour;
+    let name = document.querySelector("#wallet-creation #wallet > input[type=text]").value;
+    let colour = document.querySelector("#wallet-creation #wallet").dataset.colour;
 
     if (!name) {
         flag = false;
@@ -128,10 +130,10 @@ function createWallet() {
         return;
     }
 
-    let name = document.querySelector("#wallet-creation > input[type=text]").value;
-    let colour = document.querySelector("#wallet-creation").dataset.colour;
-    let limit = document.querySelector("#wallet-creation #limits > input[type=number]").value;
-    let limit_type = document.querySelector("#wallet-creation #limits #duration-selection > h5:first-of-type").innerHTML;
+    let name = document.querySelector("#wallet-creation #wallet > input[type=text]").value;
+    let colour = document.querySelector("#wallet-creation #wallet").dataset.colour;
+    let limit = document.querySelector("#wallet-creation #wallet #limits > input[type=number]").value;
+    let limit_type = document.querySelector("#wallet-creation #wallet #limits #duration-selection > h5:first-of-type").innerHTML;
 
     if ((limit == '') || (limit == 0)) {
         limit_type = "Unlimited";
@@ -241,13 +243,53 @@ function toggleWalletInfo(w=null) {
     if (w === null) {
         document.querySelector("#overlay #wallet-info").ariaLabel = "closed";
     } else {
-        console.log(w);
+        let wallet = walletData[w];
+        let parent = document.querySelector("#overlay #wallet-info #wallet");
+
+        parent.querySelector("#name").value = wallet['name'];
+        parent.querySelector("#amount").innerHTML = currencyFormatter.format(wallet['balance']);
+
+        walletInfoColourSelect(wallet['colour']);
+
+        if (wallet['limit'] == "Unlimited") {
+            parent.querySelector("#limit #info").style.display = "none";
+
+            parent.querySelector("#duration-selection > h5").innerHTML = 'unlimited';
+
+            parent.querySelector("#limit-section #remaining").innerHTML = '';
+        } else {
+            parent.querySelector("#limit #info").style.display = "flex";
+
+            // console.log(wallet['limit']);
+            let t = Object.keys(wallet['limit'])[0];
+            parent.querySelector("#duration-selection > h5").innerHTML = t.toLowerCase();
+            parent.querySelector("#limit #info input").value = wallet['limit'][t];
+
+            sendPostRequest(`${BACKEND_ADDRESS}/wallet/get_limit/${wallet['id']}`, login_info(), (r) => {
+                let response = JSON.parse(parseResponse(r));
+        
+                let available = response[1] - response[0];
+                surpassedLimit = (response[2] != 'unlimited') && (available <= 0);
+        
+                // validateTransfer();
+        
+                parent.querySelector("#limit-section #remaining").innerHTML = surpassedLimit ? `${currencyFormatter.format(response[1])} ${response[2]} limit reached!` : (response[2] != "unlimited" ? `${currencyFormatter.format(available)} until limit` : "");
+                parent.querySelector("#limit-section #remaining").ariaLabel = surpassedLimit ? 'surpassed' : '';
+            })
+        }
+
         document.querySelector("#overlay #wallet-info").ariaLabel = "open";
     }
 }
 
-function toggleWalletUpdateDurationSelection() {
-    let d = document.querySelector("#overlay #wallet-info #duration-selection");
-    d.ariaLabel = d.ariaLabel == 'open' ? 'closed' : 'open';
+_c = document.querySelector("#wallet-info #colour-selection #colours");
+_c.innerHTML = '';
+colour_themes.forEach((e, i) => {
+    _c.innerHTML += `<hr onclick="walletInfoColourSelect(${i})" style="background:${e}">`;
+})
+
+function walletInfoColourSelect(i) {
+    document.querySelector("#overlay #wallet-info #wallet").style.background = colour_themes[i];
+    document.querySelector("#overlay #wallet-info #wallet").dataset.colour = i;
 }
 // #endregion
