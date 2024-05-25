@@ -91,25 +91,36 @@
                     <span id="file-qr-result">None</span> -->
                 </div>
             </div>
-            <div id="destination" aria-label="open">
-                <div id="query-input">
-                    <!-- <img src="/assets/qr_code.png"> -->
-                    <img id="qr" src="/assets/qr_code.png" onclick="toggleQRSection()">
-                    <input onchange="queryUser()" type="text" placeholder="username/ID">
-                    <img onclick="queryUser()" src="/assets/search.png">
+            <div id="destination-select" aria-label="user">
+                <div id="choices">
+                    <h4 id="user" aria-label="selected" onclick="selectDestinationType('user')">
+                        to user
+                    </h4>
+                    <h4 id="wallet" onclick="selectDestinationType('wallet')">
+                        between wallets
+                    </h4>
                 </div>
-                <div id="query-result">
-                    <!-- <div class="user" onclick="selectUser(this, 0)">
-                        <img src="/assets/profile.png">
-                        <div id="credentials">
-                            <h4>lorem ipsum dolor</h4>
-                            <h5 id="code">#95a3-4124</h5>
+                <div id="destination" aria-label="open">
+                    <div id="query-input">
+                        <!-- <img src="/assets/qr_code.png"> -->
+                        <img id="qr" src="/assets/qr_code.png" onclick="toggleQRSection()">
+                        <input onchange="queryUser()" type="text" placeholder="username/ID">
+                        <img onclick="queryUser()" src="/assets/search.png">
+                    </div>
+                    <div id="query-result">
+                    </div>
+                </div>
+                <div id="wallet-section">
+                    <div id="wallet-select" aria-label="closed">
+                        <h4 onclick="toggleWalletTransferChoices(this)">savings</h4>
+                        <div id="choices">
+                            <h4>wallet</h4>
+                            <h4>savings</h4>
                         </div>
                     </div>
-                    <div class="user" onclick="selectUser(this, 1)">
-                        <img src="/assets/profile.png">
-                        <h4>sit amet consectetuer</h4>
-                    </div> -->
+                    <h4>
+                        with $4000.00
+                    </h4>
                 </div>
             </div>
             <div id="confirmation">

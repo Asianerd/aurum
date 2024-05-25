@@ -100,9 +100,11 @@ impl Wallet {
     }
 
     pub fn update_wallet(&mut self, name: String, colour: u128, limit: WalletLimit) {
-        self.name = name.clone();
+        if self.id != 0 {
+            self.name = name.clone();
+            self.limit = limit.clone();
+        }
         self.colour = colour;
-        self.limit = limit.clone();
     }
 }
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, PartialOrd, Ord)]
@@ -110,6 +112,8 @@ pub enum WalletResult {
     Success,
 
     WalletNoExist,
+
+    WalletIsDefault, // dont allow delete/updating
 
     InsufficientAmount,
     ReachedLimit
@@ -155,7 +159,12 @@ pub fn delete_wallet(db: &State<Mutex<AccountHandler>>, login: LoginInformation,
     let mut db = db.lock().unwrap();
     let result = login.login(&db);
     match result {
-        LoginResult::Success(user_id) => utils::parse_response_to_string(Ok(db.users.get_mut(&user_id).unwrap().delete_wallet(&wallet_id))),
+        LoginResult::Success(user_id) => {
+            let r = utils::parse_response_to_string(Ok(db.users.get_mut(&user_id).unwrap().delete_wallet(&wallet_id)));
+            db.save();
+
+            r
+        },
         _ => utils::parse_response_to_string(Err(result))
     }
 }
@@ -177,6 +186,7 @@ pub fn update_wallet(db: &State<Mutex<AccountHandler>>, login: LoginInformation,
                         },
                         Err(_) => WalletLimit::Unlimited
                     });
+                    db.save();
                     utils::parse_response_to_string(Ok("ok"))
                 },
                 None => utils::parse_response_to_string(Err(WalletResult::WalletNoExist))
@@ -269,6 +279,16 @@ pub fn transfer_balance(db: &State<Mutex<AccountHandler>>, login: LoginInformati
     let result =  login.login(&db);
     match result {
         LoginResult::Success(user_id) => utils::parse_response_to_string(Ok(user::User::transfer_balance(&mut db, to_user, to_wallet, user_id, from_wallet, amount))),
+        _ => utils::parse_response_to_string(Err(result))
+    }
+}
+
+#[post("/<from_wallet>/<to_wallet>/<amount>", data="<login>")]
+pub fn transfer_between_wallets(db: &State<Mutex<AccountHandler>>, login: LoginInformation, from_wallet: u128, to_wallet: u128, amount: f64) -> String {
+    let mut db = db.lock().unwrap();
+    let result =  login.login(&db);
+    match result {
+        LoginResult::Success(user_id) => utils::parse_response_to_string(Ok(user::User::transfer_balance(&mut db, user_id, to_wallet, user_id, from_wallet, amount))),
         _ => utils::parse_response_to_string(Err(result))
     }
 }

@@ -226,6 +226,10 @@ impl User {
             return WalletResult::WalletNoExist;
         }
 
+        if *wallet_id == 0 {
+            return WalletResult::WalletIsDefault;
+        }
+
         let balance = self.get_balance(wallet_id).unwrap();
         self.alter_balance(&0, &balance);
         // move all money to the general wallet

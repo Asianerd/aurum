@@ -24,6 +24,7 @@ var currencyFormatter = new Intl.NumberFormat('en-UK', {
 var selectedUser = null;
 var selectedUserData = ['username', 'code']; // for transfer results
 var selectedWallet = 0;
+var selectedWalletTransfer = 0;
 var surpassedLimit = false;
 
 var users = [];
@@ -48,15 +49,22 @@ function selectUser(e, user_id, username, code) {
 
 function validateTransfer() {
     let flag = true;
-    if (selectedUser == null) {
-        flag = false;
-    }
-    let amount = document.querySelector("#transfer-amount input").value;
-    if ((amount == '') || (amount == 0)) {
-        flag = false;
-    }
-    if (surpassedLimit) {
-        flag = false;
+
+    if (document.querySelector("#destination-select").ariaLabel == 'user') {
+        if (selectedUser == null) {
+            flag = false;
+        }
+        let amount = document.querySelector("#transfer-amount input").value;
+        if ((amount == '') || (amount == 0)) {
+            flag = false;
+        }
+        if (surpassedLimit) {
+            flag = false;
+        }
+    } else {
+        if (selectedWallet == selectedWalletTransfer) {
+            flag = false;
+        }
     }
 
     document.querySelector("#confirmation").ariaLabel = flag ? "enabled" : "disabled";
@@ -71,30 +79,66 @@ function submitTransfer() {
         return;
     }
 
-    let amount = document.querySelector("#transfer-amount input").value;
+    if (document.querySelector("#destination-select").ariaLabel == 'user') {
+        let amount = document.querySelector("#transfer-amount input").value;
 
-    // /<from_wallet>/<to_user>/<to_wallet>/<amount>
-    var params = `${selectedWallet}/${selectedUser}/0/${amount}`;
-    sendPostRequest(`${BACKEND_ADDRESS}/wallet/transfer_balance/${params}`, login_info(), (r) => {
-        let response = JSON.parse(parseResponse(r));
+        // /<from_wallet>/<to_user>/<to_wallet>/<amount>
+        var params = `${selectedWallet}/${selectedUser}/0/${amount}`;
+        sendPostRequest(`${BACKEND_ADDRESS}/wallet/transfer_balance/${params}`, login_info(), (r) => {
+            let response = JSON.parse(parseResponse(r));
 
-        let state = response['Ok'];
+            let state = response['Ok'];
 
-        if (state == "Success") {
-            displayTransferResult("Success!", `${currencyFormatter.format(amount)} successfully transferred to ${selectedUserData[0]} (#${selectedUserData[1].slice(0, 4)}-${selectedUserData[1].slice(4, 8)})`);
-        } else {
-            let d = {
-                "InsufficientAmount":"Insufficient funds",
-                "ReachedLimit":"Wallet limit exceeded!"
-            }[state];
-            displayTransferResult(
-                "Transfer failed!",
-                d == undefined ? "idk why lmao" : d
-            )
-        }
+            if (state == "Success") {
+                displayTransferResult("Success!", `${currencyFormatter.format(amount)} successfully transferred to ${selectedUserData[0]} (#${selectedUserData[1].slice(0, 4)}-${selectedUserData[1].slice(4, 8)})`);
+            } else {
+                let d = {
+                    "InsufficientAmount":"Insufficient funds",
+                    "ReachedLimit":"Wallet limit exceeded!"
+                }[state];
+                displayTransferResult(
+                    "Transfer failed!",
+                    d == undefined ? "idk why lmao" : d
+                )
+            }
 
-        fetchWallets();
-    })
+            fetchWallets();
+        })
+    } else {
+        let amount = document.querySelector("#transfer-amount input").value;
+        // /<from_wallet>/<to_wallet>/<amount>
+        var params = `${selectedWallet}/${selectedWalletTransfer}/${amount}`;
+
+        let result = [];
+
+        wallets.forEach((e) => {
+            if (e['id'] == selectedWallet) { result[0] = {...e}; }
+        });
+        wallets.forEach((e) => {
+            if (e['id'] == selectedWalletTransfer) { result[1] = {...e}; }
+        });
+
+        sendPostRequest(`${BACKEND_ADDRESS}/wallet/transfer_between_wallets/${params}`, login_info(), (r) => {
+            let response = JSON.parse(parseResponse(r));
+
+            let state = response['Ok'];
+
+            if (state == "Success") {
+                displayTransferResult("Success!", `${currencyFormatter.format(amount)} successfully transferred from ${result[0]['name']} to ${result[1]['name']}`);
+            } else {
+                let d = {
+                    "InsufficientAmount":"Insufficient funds",
+                    "ReachedLimit":"Wallet limit exceeded!"
+                }[state];
+                displayTransferResult(
+                    "Transfer failed!",
+                    d == undefined ? "idk why lmao" : d
+                )
+            }
+
+            fetchWallets();
+        })
+    }
 }
 
 function displayTransferResult(header, description) {
@@ -116,8 +160,8 @@ function fetchWallets() {
             container.innerHTML += `<h4 onclick='selectWallet(${e['id']})'>${e['name']}</h4>`;
         });
 
-        selectWallet(selectedWallet);
-        toggleWalletChoices();
+        selectWallet(selectedWallet); // opens wallet by default
+        toggleWalletChoices(); // closes it immediately
     })
 }
 
@@ -150,7 +194,62 @@ function selectWallet(id) {
 }
 
 function toggleWalletChoices() {
-    document.querySelector("#wallet-select").ariaLabel = document.querySelector("#wallet-select").ariaLabel == "open" ? "closed" : "open";
+    document.querySelector("#user-data #wallet-select").ariaLabel = document.querySelector("#user-data #wallet-select").ariaLabel == "open" ? "closed" : "open";
+}
+// #endregion
+
+// #region inter-account transfer (between wallets)
+function selectDestinationType(t) {
+    if (t == "user") {
+        document.querySelector("#destination-select #choices #wallet").ariaLabel = '';
+        document.querySelector("#destination-select #choices #user").ariaLabel = 'selected';
+        document.querySelector("#destination-select").ariaLabel = 'user';
+    } else {
+        document.querySelector("#destination-select #choices #wallet").ariaLabel = 'selected';
+        document.querySelector("#destination-select #choices #user").ariaLabel = '';
+        document.querySelector("#destination-select").ariaLabel = 'wallet';
+    }
+
+    validateTransfer();
+}
+
+fetchTransferWallets();
+
+function fetchTransferWallets() {
+    sendPostRequest(`${BACKEND_ADDRESS}/wallet/get_wallets`, login_info(), (r) => {
+        wallets = JSON.parse(parseResponse(r));
+
+        let container = document.querySelector("#destination-select #wallet-section #choices");
+        container.innerHTML = '';
+        wallets.forEach((e) => {
+            container.innerHTML += `<h4 onclick='selectWalletTransfer(${e['id']})'>${e['name']}</h4>`;
+        });
+
+        selectWalletTransfer(selectedWalletTransfer); // opens wallet by default
+        toggleWalletTransferChoices(); // closes it immediately
+    })
+}
+
+function selectWalletTransfer(id) {
+    let target = null;
+    wallets.forEach((e) => {
+        if (e['id'] == id) {
+            target = {...e};
+        }
+    });
+
+    selectedWalletTransfer = id;
+    
+    document.querySelector("#destination-select #wallet-select > h4").innerHTML = target['name'];
+    document.querySelector("#destination-select #wallet-section > h4").innerHTML = `with ${currencyFormatter.format(target['balance'])}`;
+
+    toggleWalletTransferChoices();
+    validateTransfer();
+}
+
+function toggleWalletTransferChoices() {
+    let d = document.querySelector("#destination-select #wallet-select");
+    d.ariaLabel = d.ariaLabel == "open" ? "closed" : "open";
 }
 // #endregion
 
@@ -193,6 +292,7 @@ function toggleTransferResult(state) {
     document.querySelector("#transfer-result").ariaLabel = state ? "open" : "closed";
 }
 
+// #region qr related
 function toggleQRSection() {
     let e = document.querySelector("#qr-container");
 
@@ -229,3 +329,4 @@ function validateQRCode(code) {
     document.querySelector("#destination #query-input input").value = code;
     queryUser();
 }
+// #endregion
