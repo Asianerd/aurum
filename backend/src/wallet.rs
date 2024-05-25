@@ -40,10 +40,14 @@ impl Wallet {
         let mut n = self.balance.clone();
         n += amount;
         if n < 0f64 {
+            // if final result is less than 0
             return WalletResult::InsufficientAmount;
         }
-        if (self.get_limit() != 0f64) && ((self.expenditure + amount.abs()) > self.get_limit()) {
-            return WalletResult::ReachedLimit;
+        if amount < 0f64 {
+            // taking money from the wallet
+            if (self.get_limit() != 0f64) && ((self.expenditure + amount.abs()) > self.get_limit()) {
+                return WalletResult::ReachedLimit;
+            }
         }
         WalletResult::Success
     }
