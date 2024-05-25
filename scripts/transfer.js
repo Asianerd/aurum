@@ -62,6 +62,11 @@ function validateTransfer() {
             flag = false;
         }
     } else {
+        let amount = document.querySelector("#transfer-amount input").value;
+        if ((amount == '') || (amount == 0)) {
+            flag = false;
+        }
+        
         if (selectedWallet == selectedWalletTransfer) {
             flag = false;
         }
