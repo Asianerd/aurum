@@ -98,6 +98,12 @@ impl Wallet {
             }
         }
     }
+
+    pub fn update_wallet(&mut self, name: String, colour: u128, limit: WalletLimit) {
+        self.name = name.clone();
+        self.colour = colour;
+        self.limit = limit.clone();
+    }
 }
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub enum WalletResult {
@@ -150,6 +156,32 @@ pub fn delete_wallet(db: &State<Mutex<AccountHandler>>, login: LoginInformation,
     let result = login.login(&db);
     match result {
         LoginResult::Success(user_id) => utils::parse_response_to_string(Ok(db.users.get_mut(&user_id).unwrap().delete_wallet(&wallet_id))),
+        _ => utils::parse_response_to_string(Err(result))
+    }
+}
+
+#[post("/<wallet_id>/<name>/<colour>/<limit_type>/<limit>", data="<login>")]
+pub fn update_wallet(db: &State<Mutex<AccountHandler>>, login: LoginInformation, wallet_id: u128, name: String, colour: u128, limit_type: String, limit: f64) -> String {
+    let mut db = db.lock().unwrap();
+    let result = login.login(&db);
+    match result {
+        LoginResult::Success(user_id) => {
+            match db.users.get_mut(&user_id).unwrap().wallets.get_mut(&wallet_id) {
+                Some(w) => {
+                    w.update_wallet(name, colour, match WalletLimit::from_str(&limit_type) {
+                        Ok(t) => match t {
+                            WalletLimit::Daily(_) => WalletLimit::Daily(limit),
+                            WalletLimit::Weekly(_) => WalletLimit::Weekly(limit),
+                            WalletLimit::Monthly(_) => WalletLimit::Monthly(limit),
+                            _ => WalletLimit::Unlimited
+                        },
+                        Err(_) => WalletLimit::Unlimited
+                    });
+                    utils::parse_response_to_string(Ok("ok"))
+                },
+                None => utils::parse_response_to_string(Err(WalletResult::WalletNoExist))
+            }
+        },
         _ => utils::parse_response_to_string(Err(result))
     }
 }

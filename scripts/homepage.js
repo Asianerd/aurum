@@ -239,12 +239,20 @@ function updateLog() {
 // #endregion
 
 // #region wallet updating
+function walletInfoUpdateDuration(e) {
+    let t = e.parentNode.parentNode.querySelector("& > h5").innerHTML;
+    // console.log(t);
+    document.querySelector("#overlay #wallet-info #wallet #limit #info").style.display = t == 'unlimited' ? "none" : "flex";
+}
+
 function toggleWalletInfo(w=null) {
     if (w === null) {
         document.querySelector("#overlay #wallet-info").ariaLabel = "closed";
     } else {
         let wallet = walletData[w];
         let parent = document.querySelector("#overlay #wallet-info #wallet");
+
+        document.querySelector("#overlay #wallet-info #wallet").dataset.wallet = wallet['id'];
 
         parent.querySelector("#name").value = wallet['name'];
         parent.querySelector("#amount").innerHTML = currencyFormatter.format(wallet['balance']);
@@ -257,6 +265,7 @@ function toggleWalletInfo(w=null) {
             parent.querySelector("#duration-selection > h5").innerHTML = 'unlimited';
 
             parent.querySelector("#limit-section #remaining").innerHTML = '';
+            parent.querySelector("#limit #info input").value = 100;
         } else {
             parent.querySelector("#limit #info").style.display = "flex";
 
@@ -291,5 +300,64 @@ colour_themes.forEach((e, i) => {
 function walletInfoColourSelect(i) {
     document.querySelector("#overlay #wallet-info #wallet").style.background = colour_themes[i];
     document.querySelector("#overlay #wallet-info #wallet").dataset.colour = i;
+}
+
+function walletInfoUpdate() {
+    // name, colour, limit type, amount
+
+    let wallet = document.querySelector("#overlay #wallet-info #wallet");
+    let wallet_id = wallet.dataset.wallet;
+    let name = wallet.querySelector("#name").value;
+    let colour = wallet.dataset.colour;
+    let limit_type = wallet.querySelector("#limit-section #duration-selection > h5").innerHTML;
+    let limit_amount = wallet.querySelector("#limit-section #limit #limit-amount").value;
+
+    limit_amount = limit_amount ? limit_amount : 0;
+
+    // console.log(wallet_id, name, limit_type, limit_amount);
+
+    // #[post("/<wallet_id>/<name>/<colour>/<limit_type>/<limit>", data="<login>")]
+    // console.log(`${BACKEND_ADDRESS}/wallet/update_wallet/${wallet_id}/${name}/${colour}/${limit_type}/${limit_amount}`);
+    sendPostRequest(`${BACKEND_ADDRESS}/wallet/update_wallet/${wallet_id}/${name}/${colour}/${limit_type}/${limit_amount}`, login_info(), (r) => {
+        parseResponse(r);
+        updateInformation();
+    })
+}
+
+function deleteConfirmation(t=null) {
+    let parent = document.querySelector("#overlay #wallet-delete-confirmation");
+    if (t === false) {
+        parent.ariaLabel = 'closed';
+        return;
+    }
+    parent.ariaLabel = 'open';
+
+    let wallet_name = document.querySelector("#overlay #wallet-info #wallet #name").value;
+    parent.dataset.wallet = wallet_name;
+
+    parent.querySelector("#question").innerHTML = `enter '${wallet_name}':`;
+    parent.querySelector("input").placeholder = wallet_name;
+}
+
+function deleteWalletValidate() {
+    let parent = document.querySelector("#overlay #wallet-delete-confirmation");
+    let flag = parent.dataset.wallet == parent.querySelector("input").value;
+
+    parent.querySelector("#delete").ariaLabel = flag ? 'enabled' : 'disabled';
+    return flag;
+}
+
+function deleteWallet() {
+    if (!deleteWalletValidate()) {
+        return;
+    }
+
+    let id = document.querySelector("#overlay #wallet-info #wallet").dataset.wallet;
+
+    sendPostRequest(`${BACKEND_ADDRESS}/wallet/delete_wallet/${id}`, login_info(), (r) => {
+        deleteConfirmation(false);
+        toggleWalletInfo();
+        updateInformation();
+    })
 }
 // #endregion

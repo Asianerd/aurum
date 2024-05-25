@@ -62,10 +62,10 @@
                                                 daily
                                             </h5>
                                             <div id="choices">
-                                                <h5 onclick="selectWalletDuration(this, 'unlimited')">unlimited</h5>
-                                                <h5 onclick="selectWalletDuration(this, 'daily')">daily</h5>
-                                                <h5 onclick="selectWalletDuration(this, 'weekly')">weekly</h5>
-                                                <h5 onclick="selectWalletDuration(this, 'monthly')">monthly</h5>
+                                                <h5 onclick="selectWalletDuration(this, 'unlimited'); walletInfoUpdateDuration(this);">unlimited</h5>
+                                                <h5 onclick="selectWalletDuration(this, 'daily'); walletInfoUpdateDuration(this);">daily</h5>
+                                                <h5 onclick="selectWalletDuration(this, 'weekly'); walletInfoUpdateDuration(this);">weekly</h5>
+                                                <h5 onclick="selectWalletDuration(this, 'monthly'); walletInfoUpdateDuration(this);">monthly</h5>
                                             </div>
                                         </div>
                                         <span id="limit">
@@ -76,7 +76,7 @@
                                                 <h4>
                                                     of MYR
                                                 </h4>
-                                                <input type="text" onkeydown="this.style.width = this.value.length + 2 + 'ch';">
+                                                <input id="limit-amount" type="text" onkeydown="this.style.width = this.value.length + 2 + 'ch';">
                                             </div>
                                         </span>
                                     </div>
@@ -88,19 +88,33 @@
                         <tr>
                             <div id="actions">
                                 <div>
-                                    <img src="/assets/trash.png">
+                                    <img src="/assets/trash.png" onclick="deleteConfirmation()">
                                     <div id="colour-selection">
                                         <img src="/assets/colour_wheel.png" onclick="toggleWalletColourThemes(this)">
                                         <div id="colours" aria-label="closed"></div>
                                     </div>
                                 </div>
-                                <h4 onclick="toggleWalletInfo()">
+                                <h4 onclick="walletInfoUpdate(); toggleWalletInfo()">
                                     save
                                 </h4>
                             </div>
                         </tr>
                     </tbody>
                 </table>
+            </div>
+            <div id="wallet-delete-confirmation" aria-label="closed">
+                <div id="content">
+                    <h4>delete this wallet?</h4>
+                    <h5>THIS ACTION CANNOT BE UNDONE!</h5>
+                    <span>
+                        <h4 id="question">enter 'wallet':</h4>
+                        <input type="text" onchange="deleteWalletValidate()">
+                    </span>
+                    <div>
+                        <h4 onclick="deleteConfirmation(false)">return</h4>
+                        <h4 id="delete" onclick="deleteWallet()">delete</h4>
+                    </div>
+                </div>
             </div>
         </div>
         <div id="parent">
