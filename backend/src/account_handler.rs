@@ -2,9 +2,11 @@ use std::{collections::HashMap, sync::Mutex};
 
 use rand::rngs::ThreadRng;
 use rocket::State;
+use serde::{Deserialize, Serialize};
 
 use crate::{log::Log, user::{self, User}, utils, wallet::{self, Wallet}};
 
+#[derive(Clone, Serialize, Deserialize)]
 pub struct AccountHandler {
     pub users: HashMap<u128, User>,
     pub log: Log,

@@ -20,6 +20,26 @@ pub struct Entry {
     pub from_wallet: u128,
 
     pub amount: f64,
+
+
+    // pub id: u128,
+    // pub species: Species,
+
+    // pub time: u128, // epoch unix utc
+
+    // pub to: u128,
+    // pub to_code: String,
+    // pub to_wallet: u128,
+    // pub to_name: String,
+    // pub to_wallet_name: String,
+
+    // pub from: u128,
+    // pub from_code: String,
+    // pub from_wallet: u128,
+    // pub from_name: String,
+    // pub from_wallet_name: String,
+
+    // pub amount: f64,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -43,25 +63,7 @@ impl Log {
     }
 
     pub fn save(&self) {
-        fs::write("data/logs.json", serde_json::to_string_pretty(&self).unwrap()).unwrap();
-    }
-
-    pub fn log(&mut self, time: u128, species: Species, to: u128, to_wallet: u128, from: u128, from_wallet: u128, amount: f64) {
-        let id = self.generate_log_id();
-        self.entries.insert(id, Entry {
-            id,
-            species,
-
-            time,
-
-            to,
-            to_wallet,
-
-            from,
-            from_wallet,
-
-            amount
-        });
+        // fs::write("data/logs.json", serde_json::to_string_pretty(&self).unwrap()).unwrap();
     }
 
     fn generate_log_id(&self) -> u128 {
@@ -145,6 +147,71 @@ pub enum Species {
     TopUp,
 }
 
+
+// pub fn log(db: &mut AccountHandler, time: u128, species: Species, to: u128, to_wallet: u128, from: u128, from_wallet: u128, amount: f64) {
+//     let id = db.log.generate_log_id();
+
+//     let to_user = db.users.get(&to);
+//     let from_user = db.users.get(&from);
+//     db.log.entries.insert(id, Entry {
+//         id,
+//         species,
+
+//         time,
+
+//         to,
+//         to_code: user::User::encode_id(&to),
+//         to_wallet,
+//         to_name: to_user.map_or("".to_string(), |u| u.username.to_string()),
+//         to_wallet_name: to_user
+//             .map_or(
+//                 "".to_string(), 
+//                 |u| u.wallets
+//                     .get(&to_wallet)
+//                     .map_or("".to_string(),|w| w.name.to_string()
+//                 )
+//             ),
+
+//         from,
+//         from_code: user::User::encode_id(&from),
+//         from_wallet,
+//         from_name: from_user.map_or("".to_string(), |u| u.username.to_string()),
+//         from_wallet_name: from_user
+//             .map_or(
+//                 "".to_string(), 
+//                 |u| u.wallets
+//                     .get(&from_wallet)
+//                     .map_or("".to_string(),|w| w.name.to_string()
+//                 )
+//             ),
+
+//         amount
+//     });
+// }
+
+#[derive(Serialize, Deserialize, Clone)]
+pub struct TempHolder {
+    pub entries: HashMap<u128, DetailedEntry>,
+}
+
+#[get("/")]
+pub fn update_log_format(db: &State<Mutex<AccountHandler>>) -> String {
+    // changes old log format to new log format
+    let db = db.lock().unwrap();
+    let r: Log = serde_json::from_str(fs::read_to_string("data/logs.json").unwrap().as_str()).unwrap();
+    let result = 
+        r
+            .entries
+            .iter()
+            .map(|(k, v)| (k.clone(), DetailedEntry::convert(&db, v)))
+            .collect::<HashMap<u128, DetailedEntry>>();
+    let temp = TempHolder {
+        entries: result.clone()
+    };
+    fs::write("data/logs.json", serde_json::to_string_pretty(&temp).unwrap()).unwrap();
+    panic!();
+    "success".to_string()
+}
 
 // #region api calls
 #[get("/")]

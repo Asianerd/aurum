@@ -42,6 +42,7 @@ fn rocket() -> _ {
 
         .mount("/debug_log", routes![log::debug_logs])
         .mount("/log/fetch_logs", routes![log::get_logs])
+        .mount("/debug/update_log_format", routes![log::update_log_format])
 
         .mount("/login", routes![user::login])
         .mount("/signup", routes![user::signup])

@@ -196,7 +196,8 @@ impl User {
 
         db.users.get_mut(&from).unwrap().alter_balance(&from_wallet_id, &((-amount).clone()));
         db.users.get_mut(&to).unwrap().alter_balance(&to_wallet_id, &amount);
-        db.log.log(utils::get_time(), log::Species::Transfer, to, to_wallet_id, from, from_wallet_id, amount);
+        // let db = &*db;
+        // log::log(db, utils::get_time(), log::Species::Transfer, to, to_wallet_id, from, from_wallet_id, amount);
         db.save();
 
         Ok(WalletResult::Success)

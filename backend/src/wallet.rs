@@ -269,7 +269,10 @@ pub fn top_up(db: &State<Mutex<AccountHandler>>, login: LoginInformation, wallet
     match result {
         LoginResult::Success(user_id) => {
             let r = utils::parse_response_to_string(Ok(db.users.get_mut(&user_id).unwrap().alter_balance(&wallet_id, &amount)));
-            db.log.log(utils::get_time(), log::Species::TopUp, user_id, wallet_id, 0, 0, amount);
+            // log::Log::log(&mut db.log, &db, utils::get_time(), log::Species::TopUp, user_id, wallet_id, 0, 0, amount);
+
+            
+            // log::log(&mut db, utils::get_time(), log::Species::TopUp, user_id, wallet_id, 0, 0, amount);
             db.save();
             r
         },
