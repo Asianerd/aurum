@@ -63,7 +63,7 @@ impl Log {
     }
 
     pub fn save(&self) {
-        // fs::write("data/logs.json", serde_json::to_string_pretty(&self).unwrap()).unwrap();
+        fs::write("data/logs.json", serde_json::to_string_pretty(&self).unwrap()).unwrap();
     }
 
     fn generate_log_id(&self) -> u128 {
