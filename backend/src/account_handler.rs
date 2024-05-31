@@ -4,7 +4,7 @@ use rand::rngs::ThreadRng;
 use rocket::State;
 use serde::{Deserialize, Serialize};
 
-use crate::{log::Log, user::{self, User}, utils, wallet::{self, Wallet}};
+use crate::{log::Log, user::{self, User}, utils, wallet};
 
 #[derive(Clone, Serialize, Deserialize)]
 pub struct AccountHandler {

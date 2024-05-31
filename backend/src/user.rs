@@ -12,7 +12,7 @@ use rocket::State;
 use serde::{Deserialize, Serialize};
 
 use crate::account_handler::AccountHandler;
-use crate::{log, utils};
+use crate::{log, soterius, utils};
 use crate::wallet::{Wallet, WalletLimit, WalletResult};
 
 const USER_ID_MAX: u128 = 4294967296u128; // 16^8, 2^32
@@ -50,6 +50,7 @@ impl User {
     }
 
     pub fn generate_user_id(account_handler: &AccountHandler) -> u128 {
+        // DEPRECIATED, DONT USE
         let fallback = account_handler.users
             .keys()
             .max()
@@ -245,11 +246,6 @@ impl User {
     }
     // #endregion
 }
-// #[derive(Clone, Copy, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
-// pub enum Species {
-//     Customer,
-//     Vendor
-// }
 
 
 
@@ -260,42 +256,62 @@ pub struct LoginInformation {
 }
 impl LoginInformation {
     // handles anything to do with password or logging in
-    fn get_passwords() -> HashMap<u128, String> {
-        serde_json::from_str(fs::read_to_string("data/passwords.json").unwrap().as_str()).unwrap()
-    }
+    pub fn login(&self, account_handler: &mut AccountHandler) -> LoginResult {
+        // check soterius if it exists first
 
-    fn add_password(user_id: u128, password: &String) {
-        let mut p = LoginInformation::get_passwords();
-        p.insert(user_id, password.clone());
-        fs::write("data/passwords.json", serde_json::to_string_pretty(&p).unwrap()).unwrap();
-    }
+        // if exists:
+        //      if exists in aurum -> get user id and proceed
+        //      if not exists in aurum -> generate new user id and proceed
+        // if doesnt exist -> return username no exist
 
-    pub fn login(&self, account_handler: &AccountHandler) -> LoginResult {
-        match User::lookup_user_id(account_handler, &self.username) {
-            Some(id) => match LoginInformation::get_passwords().get(&id) {
-                Some(p) => if self.password == *p { LoginResult::Success(id) } else { LoginResult::PasswordWrong },
-                None => LoginResult::PasswordNoExist
+        // let soterius: HashMap<String, (String, u128)> = serde_json::from_str(fs::read_to_string("../../data/users.json").unwrap().as_str()).unwrap();
+        // println!("{:?}", soterius);
+
+        match soterius::fetch(self.username.clone()) {
+            Some((user_id, password)) => {
+                if password != self.password {
+                    return LoginResult::PasswordWrong;
+                }
+
+                let aurum_lookup = User::lookup_user_id(account_handler, &self.username);
+                if aurum_lookup.is_none() {
+                    account_handler.users.insert(user_id, User {
+                        id: user_id,
+                        username: self.username.clone(),
+                        wallets: HashMap::from([(0u128, Wallet::default_wallet())])
+                    });
+                }
+
+                return LoginResult::Success(user_id);
             },
             None => LoginResult::UsernameNoExist
         }
+
+        // match User::lookup_user_id(account_handler, &self.username) {
+        //     Some(id) => match LoginInformation::get_passwords().get(&id) {
+        //         Some(p) => if self.password == *p { LoginResult::Success(id) } else { LoginResult::PasswordWrong },
+        //         None => LoginResult::PasswordNoExist
+        //     },
+        //     None => LoginResult::UsernameNoExist
+        // }
     }
 
-    pub fn signup(&self, account_handler: &mut AccountHandler) -> LoginResult {
-        if User::username_exists(account_handler, &self.username) {
-            return LoginResult::UsernameTaken;
-        }
+    // pub fn signup(&self, account_handler: &mut AccountHandler) -> LoginResult {
+    //     if User::username_exists(account_handler, &self.username) {
+    //         return LoginResult::UsernameTaken;
+    //     }
 
-        let id = User::generate_user_id(account_handler);
-        account_handler.users.insert(id, User {
-            id,
-            username: self.username.clone(),
-            wallets: HashMap::from([(0, Wallet::default_wallet())])
-        });
-        LoginInformation::add_password(id, &self.password);
-        account_handler.save();
+    //     let id = User::generate_user_id(account_handler);
+    //     account_handler.users.insert(id, User {
+    //         id,
+    //         username: self.username.clone(),
+    //         wallets: HashMap::from([(0, Wallet::default_wallet())])
+    //     });
+    //     LoginInformation::add_password(id, &self.password);
+    //     account_handler.save();
 
-        LoginResult::Success(id)
-    }
+    //     LoginResult::Success(id)
+    // }
 }
 
 #[rocket::async_trait]
@@ -346,18 +362,6 @@ pub enum LoginResult {
 
 
 // #region api calls
-#[post("/", data="<login>")]
-pub fn login(db: &State<Mutex<AccountHandler>>, login: LoginInformation) -> String {
-    let db = db.lock().unwrap();
-    serde_json::to_string(&login.login(&db)).unwrap()
-}
-
-#[post("/", data="<login>")]
-pub fn signup(db: &State<Mutex<AccountHandler>>, login: LoginInformation) -> String {
-    let mut db = db.lock().unwrap();
-    serde_json::to_string(&login.signup(&mut db)).unwrap()
-}
-
 // apply caching
 // remove username from cache when username is changed
 #[get("/<username>")]
@@ -372,8 +376,8 @@ pub fn get_user_id(db: &State<Mutex<AccountHandler>>, username: String) -> Strin
 
 #[post("/", data="<login>")]
 pub fn get_code(db: &State<Mutex<AccountHandler>>, login: LoginInformation) -> String {
-    let db = db.lock().unwrap();
-    let result = login.login(&db);
+    let mut db = db.lock().unwrap();
+    let result = login.login(&mut db);
     match result {
         LoginResult::Success(user_id) => utils::parse_response_to_string(Ok(User::encode_id(&user_id))),
         _ => utils::parse_response_to_string(Err(result))
@@ -382,8 +386,8 @@ pub fn get_code(db: &State<Mutex<AccountHandler>>, login: LoginInformation) -> S
 
 #[post("/<query_string>", data="<login>")]
 pub fn query_users(db: &State<Mutex<AccountHandler>>, login: LoginInformation, query_string: String) -> String {
-    let db = db.lock().unwrap();
-    let result = login.login(&db);
+    let mut db = db.lock().unwrap();
+    let result = login.login(&mut db);
     match result {
         LoginResult::Success(_) => utils::parse_response_to_string(Ok(User::query_username(&db, urlencoding::decode(&query_string).unwrap().to_string()))),
         _ => utils::parse_response_to_string(Err(result))

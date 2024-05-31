@@ -7,8 +7,8 @@ use serde::{Deserialize, Serialize};
 use crate::utils;
 use crate::{account_handler::AccountHandler, user::{LoginInformation, LoginResult}};
 
-pub fn verify_pin(account_handler: &AccountHandler, login: &LoginInformation, pin: u8) -> Result<PinResult, LoginResult> {
-    let result = login.login(&account_handler);
+pub fn verify_pin(account_handler: &mut AccountHandler, login: &LoginInformation, pin: u8) -> Result<PinResult, LoginResult> {
+    let result = login.login(account_handler);
     match result {
         LoginResult::Success(id) => {
             let pins: HashMap<u128, u8> = serde_json::from_str(fs::read_to_string("data/pins.json").unwrap().as_str()).unwrap();
@@ -21,8 +21,8 @@ pub fn verify_pin(account_handler: &AccountHandler, login: &LoginInformation, pi
     }
 }
 
-pub fn register_pin(account_handler: &AccountHandler, login: &LoginInformation, pin: u8) -> Result<PinResult, LoginResult> {
-    let result = login.login(&account_handler);
+pub fn register_pin(account_handler: &mut AccountHandler, login: &LoginInformation, pin: u8) -> Result<PinResult, LoginResult> {
+    let result = login.login(account_handler);
     match result {
         LoginResult::Success(id) => {
             let mut pins: HashMap<u128, u8> = serde_json::from_str(fs::read_to_string("data/pins.json").unwrap().as_str()).unwrap();
@@ -46,7 +46,7 @@ pub enum PinResult {
 #[post("/<pin>", data="<login>")]
 pub fn api_register_pin(db: &State<Mutex<AccountHandler>>, login: LoginInformation, pin: u8) -> String {
     let mut db = db.lock().unwrap();
-    let result = register_pin(&db, &login, pin);
+    let result = register_pin(&mut db, &login, pin);
     match result {
         Ok(r) => utils::parse_response(Ok(serde_json::to_string(&r).unwrap())),
         Err(e) => utils::parse_response(Err(serde_json::to_string(&e).unwrap()))
@@ -55,8 +55,8 @@ pub fn api_register_pin(db: &State<Mutex<AccountHandler>>, login: LoginInformati
 
 #[post("/<pin>", data="<login>")]
 pub fn api_verify_pin(db: &State<Mutex<AccountHandler>>, login: LoginInformation, pin: u8) -> String {
-    let db = db.lock().unwrap();
-    let result = verify_pin(&db, &login, pin);
+    let mut db = db.lock().unwrap();
+    let result = verify_pin(&mut db, &login, pin);
     match result {
         Ok(r) => match r {
             PinResult::Success => utils::parse_response(Ok(serde_json::to_string(&r).unwrap())),

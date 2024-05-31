@@ -139,7 +139,7 @@ pub enum WalletLimit {
 #[post("/<name>/<colour>/<limit_type>/<limit>", data="<login>")]
 pub fn create_wallet(db: &State<Mutex<AccountHandler>>, login: LoginInformation, name: String, colour: u128, limit_type: String, limit: f64) -> String {
     let mut db = db.lock().unwrap();
-    let result = login.login(&db);
+    let result = login.login(&mut db);
     match result {
         LoginResult::Success(user_id) => {
             db.users.get_mut(&user_id).unwrap().create_wallet(name, colour, match WalletLimit::from_str(&limit_type) {
@@ -161,7 +161,7 @@ pub fn create_wallet(db: &State<Mutex<AccountHandler>>, login: LoginInformation,
 #[post("/<wallet_id>", data="<login>")]
 pub fn delete_wallet(db: &State<Mutex<AccountHandler>>, login: LoginInformation, wallet_id: u128) -> String {
     let mut db = db.lock().unwrap();
-    let result = login.login(&db);
+    let result = login.login(&mut db);
     match result {
         LoginResult::Success(user_id) => {
             let r = utils::parse_response_to_string(Ok(db.users.get_mut(&user_id).unwrap().delete_wallet(&wallet_id)));
@@ -176,7 +176,7 @@ pub fn delete_wallet(db: &State<Mutex<AccountHandler>>, login: LoginInformation,
 #[post("/<wallet_id>/<name>/<colour>/<limit_type>/<limit>", data="<login>")]
 pub fn update_wallet(db: &State<Mutex<AccountHandler>>, login: LoginInformation, wallet_id: u128, name: String, colour: u128, limit_type: String, limit: f64) -> String {
     let mut db = db.lock().unwrap();
-    let result = login.login(&db);
+    let result = login.login(&mut db);
     match result {
         LoginResult::Success(user_id) => {
             match db.users.get_mut(&user_id).unwrap().wallets.get_mut(&wallet_id) {
@@ -202,8 +202,8 @@ pub fn update_wallet(db: &State<Mutex<AccountHandler>>, login: LoginInformation,
 
 #[post("/", data="<login>")]
 pub fn get_wallets(db: &State<Mutex<AccountHandler>>, login: LoginInformation) -> String {
-    let db = db.lock().unwrap();
-    let result = login.login(&db);
+    let mut db = db.lock().unwrap();
+    let result = login.login(&mut db);
     match result {
         LoginResult::Success(user_id) => {
             let mut w = db.users.get(&user_id).unwrap().wallets
@@ -219,8 +219,8 @@ pub fn get_wallets(db: &State<Mutex<AccountHandler>>, login: LoginInformation) -
 
 #[post("/", data="<login>")]
 pub fn get_total_balance(db: &State<Mutex<AccountHandler>>, login: LoginInformation) -> String {
-    let db = db.lock().unwrap();
-    let result = login.login(&db);
+    let mut db = db.lock().unwrap();
+    let result = login.login(&mut db);
     match result {
         LoginResult::Success(user_id) => utils::parse_response_to_string(
             Ok(db.users.get(&user_id).unwrap().wallets
@@ -235,8 +235,8 @@ pub fn get_total_balance(db: &State<Mutex<AccountHandler>>, login: LoginInformat
 
 #[post("/<wallet_id>", data="<login>")]
 pub fn get_balance(db: &State<Mutex<AccountHandler>>, login: LoginInformation, wallet_id: u128) -> String {
-    let db = db.lock().unwrap();
-    let result = login.login(&db);
+    let mut db = db.lock().unwrap();
+    let result = login.login(&mut db);
     match result {
         LoginResult::Success(user_id) => {
             let r = utils::parse_response_to_string(Ok(db.users.get(&user_id).unwrap().get_balance(&wallet_id)));
@@ -265,7 +265,7 @@ pub fn get_balance(db: &State<Mutex<AccountHandler>>, login: LoginInformation, w
 #[post("/<wallet_id>/<amount>", data="<login>")]
 pub fn top_up(db: &State<Mutex<AccountHandler>>, login: LoginInformation, wallet_id: u128, amount: f64) -> String {
     let mut db = db.lock().unwrap();
-    let result = login.login(&db);
+    let result = login.login(&mut db);
     match result {
         LoginResult::Success(user_id) => {
             let r = utils::parse_response_to_string(Ok(db.users.get_mut(&user_id).unwrap().alter_balance(&wallet_id, &amount)));
@@ -283,7 +283,7 @@ pub fn top_up(db: &State<Mutex<AccountHandler>>, login: LoginInformation, wallet
 #[post("/<from_wallet>/<to_user>/<to_wallet>/<amount>", data="<login>")]
 pub fn transfer_balance(db: &State<Mutex<AccountHandler>>, login: LoginInformation, from_wallet: u128, to_user: u128, to_wallet: u128, amount: f64) -> String {
     let mut db = db.lock().unwrap();
-    let result =  login.login(&db);
+    let result =  login.login(&mut db);
     match result {
         LoginResult::Success(user_id) => utils::parse_response_to_string(Ok(user::User::transfer_balance(&mut db, to_user, to_wallet, user_id, from_wallet, amount))),
         _ => utils::parse_response_to_string(Err(result))
@@ -293,7 +293,7 @@ pub fn transfer_balance(db: &State<Mutex<AccountHandler>>, login: LoginInformati
 #[post("/<from_wallet>/<to_wallet>/<amount>", data="<login>")]
 pub fn transfer_between_wallets(db: &State<Mutex<AccountHandler>>, login: LoginInformation, from_wallet: u128, to_wallet: u128, amount: f64) -> String {
     let mut db = db.lock().unwrap();
-    let result =  login.login(&db);
+    let result =  login.login(&mut db);
     match result {
         LoginResult::Success(user_id) => utils::parse_response_to_string(Ok(user::User::transfer_balance(&mut db, user_id, to_wallet, user_id, from_wallet, amount))),
         _ => utils::parse_response_to_string(Err(result))
@@ -302,8 +302,8 @@ pub fn transfer_between_wallets(db: &State<Mutex<AccountHandler>>, login: LoginI
 
 #[post("/<wallet_id>", data="<login>")]
 pub fn get_limit(db: &State<Mutex<AccountHandler>>, login: LoginInformation, wallet_id: u128) -> String {
-    let db = db.lock().unwrap();
-    let result = login.login(&db);
+    let mut db = db.lock().unwrap();
+    let result = login.login(&mut db);
     match result {
         LoginResult::Success(user_id) => {
             utils::parse_response_to_string(Ok(match db.users.get(&user_id).unwrap().wallets.get(&wallet_id) {

@@ -1,9 +1,11 @@
-use std::{path::Path, sync::Mutex};
+use std::{fs, path::Path, sync::Mutex};
 
 #[macro_use] extern crate rocket;
 
 mod utils;
 mod cors;
+
+mod soterius;
 
 mod log;
 mod wallet;
@@ -18,20 +20,6 @@ pub fn index() -> String {
 
 #[launch]
 fn rocket() -> _ {
-    // let cert_path = "/etc/letsencrypt/live/ozmium.xyz/fullchain.pem";
-    // let key_path = "/etc/letsencrypt/live/ozmium.xyz/privkey.pem";
-
-    // // Check if files exist
-    // if !Path::new(cert_path).exists() {
-    //     eprintln!("Certificate file not found: {}", cert_path);
-    //     std::process::exit(1);
-    // }
-
-    // if !Path::new(key_path).exists() {
-    //     eprintln!("Key file not found: {}", key_path);
-    //     std::process::exit(1);
-    // }
-
     rocket::custom(rocket::config::Config::figment().merge(("port", 8000)))
         .manage(Mutex::new(account_handler::AccountHandler::load()))
         .mount("/", routes![index])
@@ -43,8 +31,8 @@ fn rocket() -> _ {
         .mount("/debug_log", routes![log::debug_logs])
         .mount("/log/fetch_logs", routes![log::get_logs])
 
-        .mount("/login", routes![user::login])
-        .mount("/signup", routes![user::signup])
+        // .mount("/login", routes![user::login])
+        // .mount("/signup", routes![user::signup])
         .mount("/lookup_username", routes![user::get_user_id])
         .mount("/query_users", routes![user::query_users])
         .mount("/get_code", routes![user::get_code])

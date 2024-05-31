@@ -3,7 +3,7 @@ use std::{collections::HashMap, fs, sync::Mutex};
 use rocket::State;
 use serde::{Deserialize, Serialize};
 
-use crate::{account_handler::AccountHandler, user::{self, login, LoginInformation, LoginResult}, utils};
+use crate::{account_handler::AccountHandler, user::{self, LoginInformation, LoginResult}, utils};
 
 #[derive(Clone, PartialEq, PartialOrd, Serialize, Deserialize, Debug)]
 pub struct Entry {
@@ -203,8 +203,8 @@ pub fn debug_logs(db: &State<Mutex<AccountHandler>>) -> String {
 // stating from when, in epoch unix
 #[post("/<from>", data="<login>")]
 pub fn get_logs(db: &State<Mutex<AccountHandler>>, login: LoginInformation, from: u128) -> String {
-    let db = db.lock().unwrap();
-    let result = login.login(&db);
+    let mut db = db.lock().unwrap();
+    let result = login.login(&mut db);
     match result {
         LoginResult::Success(user_id) => utils::parse_response_to_string(Ok(
             db
