@@ -77,7 +77,7 @@ function updateInformation() {
 }
 
 function populateWallets() {
-    sendPostRequest(`${BACKEND_ADDRESS}/wallet/get_wallets`, login_info(), (r) => {
+    sendPostRequest(`${AURUM_BACKEND_ADDRESS}/wallet/get_wallets`, login_info(), (r) => {
         let response = JSON.parse(parseResponse(r));
 
         walletContainer.innerHTML = '';
@@ -96,7 +96,7 @@ function populateWallets() {
 }
 
 function updateTotalBalance() {
-    sendPostRequest(`${BACKEND_ADDRESS}/wallet/get_total_balance`, login_info(), (r) => {
+    sendPostRequest(`${AURUM_BACKEND_ADDRESS}/wallet/get_total_balance`, login_info(), (r) => {
         let response = JSON.parse(parseResponse(r));
 
         document.querySelector("#balance > h3").innerHTML = currencyFormatter.format(response);
@@ -144,7 +144,7 @@ function createWallet() {
 
     console.log(params);
 
-    sendPostRequest(`${BACKEND_ADDRESS}/wallet/create_wallet/${params}`, login_info(), () => {
+    sendPostRequest(`${AURUM_BACKEND_ADDRESS}/wallet/create_wallet/${params}`, login_info(), () => {
         updateInformation();
 
         toggleWalletCreate(false);
@@ -153,7 +153,7 @@ function createWallet() {
 // #endregion
 
 // #region logs
-sendPostRequest(`${BACKEND_ADDRESS}/get_code`, login_info(), (r) => {
+sendPostRequest(`${AURUM_BACKEND_ADDRESS}/get_code`, login_info(), (r) => {
     let response = parseResponse(r);
 
     userCode = JSON.parse(response);
@@ -163,7 +163,7 @@ sendPostRequest(`${BACKEND_ADDRESS}/get_code`, login_info(), (r) => {
 
 
 function updateLog() {
-    sendPostRequest(`${BACKEND_ADDRESS}/log/fetch_logs/${0}`, login_info(), (r) => {
+    sendPostRequest(`${AURUM_BACKEND_ADDRESS}/log/fetch_logs/${0}`, login_info(), (r) => {
         let response = JSON.parse(parseResponse(r));
 
         let container = document.querySelector("#history > table > tbody");
@@ -274,7 +274,7 @@ function toggleWalletInfo(w=null) {
             parent.querySelector("#duration-selection > h5").innerHTML = t.toLowerCase();
             parent.querySelector("#limit #info input").value = wallet['limit'][t];
 
-            sendPostRequest(`${BACKEND_ADDRESS}/wallet/get_limit/${wallet['id']}`, login_info(), (r) => {
+            sendPostRequest(`${AURUM_BACKEND_ADDRESS}/wallet/get_limit/${wallet['id']}`, login_info(), (r) => {
                 let response = JSON.parse(parseResponse(r));
         
                 let available = response[1] - response[0];
@@ -318,7 +318,7 @@ function walletInfoUpdate() {
 
     // #[post("/<wallet_id>/<name>/<colour>/<limit_type>/<limit>", data="<login>")]
     // console.log(`${BACKEND_ADDRESS}/wallet/update_wallet/${wallet_id}/${name}/${colour}/${limit_type}/${limit_amount}`);
-    sendPostRequest(`${BACKEND_ADDRESS}/wallet/update_wallet/${wallet_id}/${name}/${colour}/${limit_type}/${limit_amount}`, login_info(), (r) => {
+    sendPostRequest(`${AURUM_BACKEND_ADDRESS}/wallet/update_wallet/${wallet_id}/${name}/${colour}/${limit_type}/${limit_amount}`, login_info(), (r) => {
         parseResponse(r);
         updateInformation();
     })
@@ -354,7 +354,7 @@ function deleteWallet() {
 
     let id = document.querySelector("#overlay #wallet-info #wallet").dataset.wallet;
 
-    sendPostRequest(`${BACKEND_ADDRESS}/wallet/delete_wallet/${id}`, login_info(), (r) => {
+    sendPostRequest(`${AURUM_BACKEND_ADDRESS}/wallet/delete_wallet/${id}`, login_info(), (r) => {
         deleteConfirmation(false);
         toggleWalletInfo();
         updateInformation();

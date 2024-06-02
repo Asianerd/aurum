@@ -1,5 +1,5 @@
 document.querySelector("#user-data #username").innerHTML = username;
-sendPostRequest(`${BACKEND_ADDRESS}/get_code`, login_info(), (r) => {
+sendPostRequest(`${AURUM_BACKEND_ADDRESS}/get_code`, login_info(), (r) => {
     let response = JSON.parse(parseResponse(r));
 
     document.querySelector("#overlay #self-qr > div").appendChild(QRCode({
@@ -89,7 +89,7 @@ function submitTransfer() {
 
         // /<from_wallet>/<to_user>/<to_wallet>/<amount>
         var params = `${selectedWallet}/${selectedUser}/0/${amount}`;
-        sendPostRequest(`${BACKEND_ADDRESS}/wallet/transfer_balance/${params}`, login_info(), (r) => {
+        sendPostRequest(`${AURUM_BACKEND_ADDRESS}/wallet/transfer_balance/${params}`, login_info(), (r) => {
             let response = JSON.parse(parseResponse(r));
 
             let state = response['Ok'];
@@ -123,7 +123,7 @@ function submitTransfer() {
             if (e['id'] == selectedWalletTransfer) { result[1] = {...e}; }
         });
 
-        sendPostRequest(`${BACKEND_ADDRESS}/wallet/transfer_between_wallets/${params}`, login_info(), (r) => {
+        sendPostRequest(`${AURUM_BACKEND_ADDRESS}/wallet/transfer_between_wallets/${params}`, login_info(), (r) => {
             let response = JSON.parse(parseResponse(r));
 
             let state = response['Ok'];
@@ -156,7 +156,7 @@ function displayTransferResult(header, description) {
 fetchWallets();
 
 function fetchWallets() {
-    sendPostRequest(`${BACKEND_ADDRESS}/wallet/get_wallets`, login_info(), (r) => {
+    sendPostRequest(`${AURUM_BACKEND_ADDRESS}/wallet/get_wallets`, login_info(), (r) => {
         wallets = JSON.parse(parseResponse(r));
 
         let container = document.querySelector("#wallet-section #choices");
@@ -185,7 +185,7 @@ function selectWallet(id) {
 
     toggleWalletChoices();
 
-    sendPostRequest(`${BACKEND_ADDRESS}/wallet/get_limit/${selectedWallet}`, login_info(), (r) => {
+    sendPostRequest(`${AURUM_BACKEND_ADDRESS}/wallet/get_limit/${selectedWallet}`, login_info(), (r) => {
         let response = JSON.parse(parseResponse(r));
 
         let available = response[1] - response[0];
@@ -221,7 +221,7 @@ function selectDestinationType(t) {
 fetchTransferWallets();
 
 function fetchTransferWallets() {
-    sendPostRequest(`${BACKEND_ADDRESS}/wallet/get_wallets`, login_info(), (r) => {
+    sendPostRequest(`${AURUM_BACKEND_ADDRESS}/wallet/get_wallets`, login_info(), (r) => {
         wallets = JSON.parse(parseResponse(r));
 
         let container = document.querySelector("#destination-select #wallet-section #choices");
@@ -267,7 +267,7 @@ function queryUser() {
         return;
     }
 
-    sendPostRequest(`${BACKEND_ADDRESS}/query_users/${encodeURIComponent(document.querySelector("#query-input input").value)}`, login_info(), (r) => {
+    sendPostRequest(`${AURUM_BACKEND_ADDRESS}/query_users/${encodeURIComponent(document.querySelector("#query-input input").value)}`, login_info(), (r) => {
         let response = JSON.parse(parseResponse(r));
         container.innerHTML = '';
 

@@ -35,9 +35,9 @@ function submitTopup() {
         return;
     }
 
-    console.log(`${BACKEND_ADDRESS}/wallet/top_up/${selectedWallet}/${amount}`);
+    console.log(`${AURUM_BACKEND_ADDRESS}/wallet/top_up/${selectedWallet}/${amount}`);
 
-    sendPostRequest(`${BACKEND_ADDRESS}/wallet/top_up/${selectedWallet}/${amount}`, login_info(), (r) => {
+    sendPostRequest(`${AURUM_BACKEND_ADDRESS}/wallet/top_up/${selectedWallet}/${amount}`, login_info(), (r) => {
         let response = parseResponse(r);
 
         console.log(response);
@@ -58,7 +58,7 @@ var currencyFormatter = new Intl.NumberFormat('en-UK', {
 fetchWallets();
 
 function fetchWallets() {
-    sendPostRequest(`${BACKEND_ADDRESS}/wallet/get_wallets`, login_info(), (r) => {
+    sendPostRequest(`${AURUM_BACKEND_ADDRESS}/wallet/get_wallets`, login_info(), (r) => {
         wallets = JSON.parse(parseResponse(r));
 
         let container = document.querySelector("#wallet-section #choices");
