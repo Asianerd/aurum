@@ -3,10 +3,10 @@ var userCode;
 var walletContainer = document.querySelector("#wallets");
 var walletData = {};
 
-var currencyFormatter = new Intl.NumberFormat('en-UK', {
-    style: 'currency',
-    currency: 'MYR'
-})
+// var currencyFormatter = new Intl.NumberFormat('en-UK', {
+//     style: 'currency',
+//     currency: 'MYR'
+// })
 
 var colour_themes = [
     "crimson",
