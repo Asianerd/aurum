@@ -16,11 +16,6 @@ sendPostRequest(`${AURUM_BACKEND_ADDRESS}/get_code`, login_info(), (r) => {
     document.querySelector("#user-data #code").innerHTML = formatUserCode(response);
 })
 
-var currencyFormatter = new Intl.NumberFormat('en-UK', {
-    style: 'currency',
-    currency: 'MYR'
-})
-
 var selectedUser = null;
 var selectedUserData = ['username', 'code']; // for transfer results
 var selectedWallet = 0;

@@ -264,9 +264,6 @@ impl LoginInformation {
         //      if not exists in aurum -> generate new user id and proceed
         // if doesnt exist -> return username no exist
 
-        // let soterius: HashMap<String, (String, u128)> = serde_json::from_str(fs::read_to_string("../../data/users.json").unwrap().as_str()).unwrap();
-        // println!("{:?}", soterius);
-
         match soterius::fetch(self.username.clone()) {
             Some((user_id, password)) => {
                 if password != self.password {
@@ -286,34 +283,8 @@ impl LoginInformation {
             },
             None => LoginResult::UsernameNoExist
         }
-
-        // match User::lookup_user_id(account_handler, &self.username) {
-        //     Some(id) => match LoginInformation::get_passwords().get(&id) {
-        //         Some(p) => if self.password == *p { LoginResult::Success(id) } else { LoginResult::PasswordWrong },
-        //         None => LoginResult::PasswordNoExist
-        //     },
-        //     None => LoginResult::UsernameNoExist
-        // }
     }
-
-    // pub fn signup(&self, account_handler: &mut AccountHandler) -> LoginResult {
-    //     if User::username_exists(account_handler, &self.username) {
-    //         return LoginResult::UsernameTaken;
-    //     }
-
-    //     let id = User::generate_user_id(account_handler);
-    //     account_handler.users.insert(id, User {
-    //         id,
-    //         username: self.username.clone(),
-    //         wallets: HashMap::from([(0, Wallet::default_wallet())])
-    //     });
-    //     LoginInformation::add_password(id, &self.password);
-    //     account_handler.save();
-
-    //     LoginResult::Success(id)
-    // }
 }
-
 #[rocket::async_trait]
 impl<'l> FromData<'l> for LoginInformation {
     type Error = LoginInfoParseError;
